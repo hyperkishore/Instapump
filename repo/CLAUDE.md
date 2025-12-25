@@ -2,6 +2,8 @@
 
 Safari userscript for clean Instagram Reels viewing with account filtering.
 
+**GitHub**: https://github.com/hyperkishore/Instapump
+
 ## CRITICAL: File Sync Requirement
 
 **After EVERY command that modifies files, sync between these locations:**
