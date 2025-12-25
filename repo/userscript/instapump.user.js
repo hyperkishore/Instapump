@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.12
+// @version      2.1.13
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.12 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.13 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -385,36 +385,37 @@
     if (menu) menu.classList.remove('open');
   }
 
-  // Find the currently visible reel/article
-  function getVisibleReel() {
-    const articles = Array.from(document.querySelectorAll('article'));
-    if (articles.length === 0) return null;
+  // Find the currently visible clips overlay (the main reel container)
+  function getVisibleClipsOverlay() {
+    const overlays = document.querySelectorAll('[id^="clipsoverlay"]');
+    const vh = window.innerHeight;
 
-    let bestArticle = null;
-    let maxVisible = 0;
-
-    articles.forEach(article => {
-      const rect = article.getBoundingClientRect();
+    for (const overlay of overlays) {
+      const rect = overlay.getBoundingClientRect();
+      // Check if this overlay is mostly visible (covers > 50% of viewport)
       const visibleTop = Math.max(rect.top, 0);
-      const visibleBottom = Math.min(rect.bottom, window.innerHeight);
-      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+      const visibleBottom = Math.min(rect.bottom, vh);
+      const visibleHeight = visibleBottom - visibleTop;
 
-      if (visibleHeight > maxVisible) {
-        maxVisible = visibleHeight;
-        bestArticle = article;
+      if (visibleHeight > vh * 0.5) {
+        return overlay;
       }
-    });
-
-    return bestArticle;
+    }
+    return null;
   }
 
-  // Username detection - scoped to visible reel
+  // Username detection - find username from visible reel
   function detectUsername() {
     const excludeNames = ['reels', 'explore', 'p', 'reel', 'direct', 'stories', 'accounts', 'about', 'audio', 'music', 'tags', 'locations'];
 
-    // Get the currently visible reel
-    const visibleReel = getVisibleReel();
-    const searchScope = visibleReel || document;
+    // Find the visible clips overlay and search within its parent container
+    const visibleOverlay = getVisibleClipsOverlay();
+    // Go up to find a reasonable container (article or section)
+    const container = visibleOverlay?.closest('article') ||
+                      visibleOverlay?.closest('section') ||
+                      visibleOverlay?.parentElement?.parentElement?.parentElement;
+
+    const searchScope = container || document;
 
     // Method 1: Look for aria-label containing "reels" (most reliable)
     const ariaLinks = searchScope.querySelectorAll('a[aria-label*="reels"]');
@@ -427,22 +428,20 @@
       }
     }
 
-    // Method 2: Look for username links (even if hidden)
+    // Method 2: Look for username links
     const links = searchScope.querySelectorAll('a[href^="/"]');
     for (const link of links) {
       const href = link.href || '';
       const match = href.match(/instagram\.com\/([a-zA-Z0-9._]+)\/?$/);
       if (match && !excludeNames.includes(match[1])) {
-        // Check if this looks like a username link (not nav)
         const text = link.textContent?.trim() || '';
-        // Username links usually have the username as text or are near profile section
         if (text && text.length < 30 && !text.includes('Home') && !text.includes('Explore')) {
           return match[1].toLowerCase();
         }
       }
     }
 
-    // Method 3: Any valid username link within scope
+    // Method 3: Any valid username link in scope
     for (const link of links) {
       const href = link.href || '';
       const match = href.match(/instagram\.com\/([a-zA-Z0-9._]+)\/?$/);
@@ -1031,7 +1030,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.12';
+    version.textContent = 'v2.1.13';
     document.body.appendChild(version);
 
     // Status border
@@ -1274,7 +1273,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.12 loaded - Added version badge');
+    log('InstaPump v2.1.13 loaded - Fixed username detection via clips overlay');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
