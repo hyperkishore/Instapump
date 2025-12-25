@@ -1,0 +1,15 @@
+[7:37:08 PM] Found 3 links in reel
+[7:37:08 PM] Sample links: /markbrazil/reels/ | /reels/audio/9562397333884039/ | /reels/audio/9562397333884039/
+[7:37:08 PM] Found username: markbrazil
+[7:37:08 PM] New user: @markbrazil
+[7:37:08 PM] Allowlist raw: []
+[7:37:09 PM] Vid: 402x669 @-8028,0 playing:false
+[7:37:09 PM] Videos on page: 15
+[7:37:09 PM] Video containers found: 15
+[7:37:09 PM] Found 15 presentations
+[7:37:09 PM] Found 3 links in reel
+[7:37:09 PM] Sample links: /headshotsinc/reels/ | /reels/audio/600917865670697/ | /reels/audio/600917865670697/
+[7:37:09 PM] Found username: headshotsinc
+[7:37:09 PM] New user: @headshotsinc
+[7:37:09 PM] Allowlist raw: []
+[7:37:09 PM] Auto-logging OFF
