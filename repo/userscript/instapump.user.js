@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.10
+// @version      2.1.11
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.10 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.11 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -371,12 +371,39 @@
     if (menu) menu.classList.remove('open');
   }
 
-  // Username detection
+  // Find the currently visible reel/article
+  function getVisibleReel() {
+    const articles = Array.from(document.querySelectorAll('article'));
+    if (articles.length === 0) return null;
+
+    let bestArticle = null;
+    let maxVisible = 0;
+
+    articles.forEach(article => {
+      const rect = article.getBoundingClientRect();
+      const visibleTop = Math.max(rect.top, 0);
+      const visibleBottom = Math.min(rect.bottom, window.innerHeight);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+      if (visibleHeight > maxVisible) {
+        maxVisible = visibleHeight;
+        bestArticle = article;
+      }
+    });
+
+    return bestArticle;
+  }
+
+  // Username detection - scoped to visible reel
   function detectUsername() {
     const excludeNames = ['reels', 'explore', 'p', 'reel', 'direct', 'stories', 'accounts', 'about', 'audio', 'music', 'tags', 'locations'];
 
+    // Get the currently visible reel
+    const visibleReel = getVisibleReel();
+    const searchScope = visibleReel || document;
+
     // Method 1: Look for aria-label containing "reels" (most reliable)
-    const ariaLinks = document.querySelectorAll('a[aria-label*="reels"]');
+    const ariaLinks = searchScope.querySelectorAll('a[aria-label*="reels"]');
     for (const link of ariaLinks) {
       const label = link.getAttribute('aria-label') || '';
       // aria-label format: "username reels"
@@ -387,7 +414,7 @@
     }
 
     // Method 2: Look for username links (even if hidden)
-    const links = document.querySelectorAll('a[href^="/"]');
+    const links = searchScope.querySelectorAll('a[href^="/"]');
     for (const link of links) {
       const href = link.href || '';
       const match = href.match(/instagram\.com\/([a-zA-Z0-9._]+)\/?$/);
@@ -401,7 +428,7 @@
       }
     }
 
-    // Method 3: Any valid username link
+    // Method 3: Any valid username link within scope
     for (const link of links) {
       const href = link.href || '';
       const match = href.match(/instagram\.com\/([a-zA-Z0-9._]+)\/?$/);
@@ -512,6 +539,8 @@
     if (!el || isInstaPumpElement(el) || isVideoContainer(el)) return false;
     // Don't hide the clips overlay itself (keeps tap-to-mute working)
     if (isClipsOverlay(el)) return false;
+    // Don't hide elements that CONTAIN a clips overlay (parents of audio control)
+    if (el.querySelector('[id^="clipsoverlay"]')) return false;
     el.style.setProperty('display', 'none', 'important');
     el.setAttribute('data-instapump-hidden', 'true'); // Mark for restore
     return true;
@@ -1225,7 +1254,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.10 loaded - Updated patterns + clips protection');
+    log('InstaPump v2.1.11 loaded - Fixed audio toggle + username tracking');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
