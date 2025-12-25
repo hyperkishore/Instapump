@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.11
+// @version      2.1.12
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.11 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.12 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -208,6 +208,20 @@
     #instapump-swipe.show { opacity: 1; }
     #instapump-swipe.approve { color: #34c759; }
     #instapump-swipe.reject { color: #ff3b30; }
+
+    /* Version badge */
+    #instapump-version {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      color: white;
+      font-size: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      opacity: 0.7;
+      z-index: 999999;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
 
     /* Logs panel */
     #instapump-logs {
@@ -1014,6 +1028,12 @@
       return;
     }
 
+    // Version badge
+    const version = document.createElement('div');
+    version.id = 'instapump-version';
+    version.textContent = 'v2.1.12';
+    document.body.appendChild(version);
+
     // Status border
     const status = document.createElement('div');
     status.id = 'instapump-status';
@@ -1254,7 +1274,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.11 loaded - Fixed audio toggle + username tracking');
+    log('InstaPump v2.1.12 loaded - Added version badge');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
