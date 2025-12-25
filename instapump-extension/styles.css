@@ -1,0 +1,365 @@
+/* InstaPump - Clean Reels Experience CSS */
+
+/* Hide bottom navigation bar */
+div[role="tablist"],
+nav[role="navigation"] {
+  display: none !important;
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Hide music/audio info links (but not the mute button) */
+/* Commented out to allow audio controls
+a[href*="/audio/"],
+a[href*="/music/"] {
+  display: none !important;
+}
+*/
+
+/* Black background */
+body, html {
+  background: black !important;
+}
+
+/* Scroll snap for reels */
+html, body {
+  scroll-snap-type: y mandatory !important;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  scrollbar-width: none !important;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Remove Instagram's width and height constraints on video containers */
+/* Use :has() to target any div that contains a video element */
+div:has(> video),
+div:has(> div > video),
+div:has(> div > div > video),
+div:has(> div > div > div > video),
+div:has(> div > div > div > div > video),
+div:has(> div > div > div > div > div > video),
+div:has(> div > div > div > div > div > div > video) {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  left: 0 !important;
+  margin-left: 0 !important;
+  overflow: visible !important;
+}
+
+/* Video element itself */
+video {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  object-fit: contain !important;
+}
+
+/* Each reel presentation should snap with gaps */
+[role="presentation"] {
+  scroll-snap-align: start !important;
+  scroll-snap-stop: always !important;
+  margin-bottom: 40px !important;
+  margin-top: 20px !important;
+  border-radius: 12px !important;
+  overflow: visible !important;
+  min-height: 100vh !important;
+}
+
+/* Video display without cropping */
+video {
+  object-fit: contain !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: auto !important;
+  max-height: 100vh !important;
+}
+
+/* Hide any scrollbars */
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+* {
+  scrollbar-width: none !important;
+}
+
+/* Main container scroll snap */
+main, [role="main"], [role="feed"] {
+  scroll-snap-type: y mandatory !important;
+  height: 100vh !important;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+}
+
+/* Hide right side panel */
+div.x1nhvcw1.x1oa3qoh.x6s0dn4.xqjyukv.x1q0g3np.x2lah0s.x1c4vz4f {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide interaction buttons panel */
+div.x1g9anri.x78zum5.xvs91rp.xmix8c7.xd4r4e8.x6ikm8r.x10wlt62.x1i0vuye {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide bottom overlay */
+div.x1diwwjn.x1247r65.x13a6bvl {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide side panel */
+div.xuk3077.x1nhvcw1.xdt5ytf {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide right side buttons */
+article div[style*="right"] {
+  display: none !important;
+}
+
+/* Remove padding from wrapper divs */
+div.xyamay9.x1l90r2v,
+div.xl56j7k.x1l90r2v.xyamay9 {
+  padding: 0 !important;
+}
+
+/* Keep username visible - don't hide account names */
+/* Only hide non-essential UI like like counts, comments */
+
+/* Hide SVG icons except mute button */
+/* Commented out - was hiding mute/unmute button
+article svg {
+  display: none !important;
+}
+*/
+
+/* Hide canvas elements */
+article canvas {
+  display: none !important;
+}
+
+/* Hide profile images */
+article img {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+img.xz74otr,
+img.x5yr21d,
+img.x1d8287x {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide additional UI overlays */
+div.xuk3077.x1oa3qoh.x1nhvcw1,
+div.xrok2fi.xz4gly6,
+div.x5lhr3w.xeuugli {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* ==================== InstaPump UI ==================== */
+
+/* Control Panel */
+#instapump-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.instapump-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s;
+}
+
+.instapump-btn:hover {
+  transform: scale(1.1);
+}
+
+.instapump-btn:active {
+  transform: scale(0.95);
+}
+
+#instapump-approve {
+  background: linear-gradient(135deg, #34c759, #30d158);
+}
+
+#instapump-reject {
+  background: linear-gradient(135deg, #ff3b30, #ff453a);
+}
+
+/* Toast Notification */
+#instapump-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.95);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  text-align: center;
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+#instapump-toast.visible {
+  opacity: 1;
+}
+
+#instapump-toast.approved {
+  background: rgba(52, 199, 89, 0.95);
+  border: 2px solid #34c759;
+}
+
+#instapump-toast.rejected {
+  background: rgba(255, 59, 48, 0.95);
+  border: 2px solid #ff3b30;
+}
+
+/* Status Border */
+#instapump-status {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 999998;
+  border: 4px solid transparent;
+  transition: border-color 0.3s;
+}
+
+#instapump-status.approved {
+  border-color: #34c759;
+}
+
+#instapump-status.rejected {
+  border-color: #ff3b30;
+}
+
+/* Username Display */
+#instapump-username {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#instapump-username.visible {
+  opacity: 1;
+}
+
+/* Mode Indicator */
+#instapump-mode {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s, background 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#instapump-mode.visible {
+  opacity: 1;
+}
+
+#instapump-mode.whitelist-mode {
+  background: rgba(52, 199, 89, 0.9);
+  color: white;
+}
+
+#instapump-mode.discovery-mode {
+  background: rgba(255, 149, 0, 0.9);
+  color: white;
+}
+
+/* Skip Counter */
+#instapump-skip-counter {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  background: rgba(0,0,0,0.6);
+  color: #888;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#instapump-skip-counter.visible {
+  opacity: 1;
+}
+
+/* Small Mode Toggle Button */
+.instapump-btn-small {
+  width: 35px !important;
+  height: 35px !important;
+  font-size: 14px !important;
+  background: linear-gradient(135deg, #5856d6, #af52de) !important;
+}
+
+#instapump-mode-btn {
+  background: linear-gradient(135deg, #5856d6, #af52de);
+}

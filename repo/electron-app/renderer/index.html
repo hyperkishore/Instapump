@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaPump</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #webview-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    webview {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Status border */
+    #status-border {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 999;
+      border: 4px solid transparent;
+      transition: border-color 0.3s;
+    }
+    #status-border.approved { border-color: #34c759; }
+    #status-border.rejected { border-color: #ff3b30; }
+
+    /* Overlay buttons */
+    #overlay {
+      position: absolute;
+      bottom: 100px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10000;
+    }
+
+    .overlay-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .overlay-btn:hover { transform: scale(1.1); }
+    #btn-approve { background: linear-gradient(135deg, #34c759, #30d158); }
+    #btn-reject { background: linear-gradient(135deg, #ff3b30, #ff453a); }
+    #btn-inspect { background: linear-gradient(135deg, #007aff, #5856d6); font-size: 16px; }
+
+    /* Username display - hidden for now */
+    #current-user {
+      display: none;
+    }
+
+    /* Toast */
+    #toast {
+      position: absolute;
+      bottom: 250px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      z-index: 10001;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    #toast.visible { opacity: 1; }
+
+    /* Loading */
+    #loading {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      z-index: 999;
+    }
+    #loading.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="webview-container">
+      <div id="loading">Loading Instagram...</div>
+      <div id="status-border"></div>
+
+      <webview
+        id="instagram-webview"
+        src="https://www.instagram.com/reels/"
+        partition="persist:instagram"
+        webpreferences="contextIsolation=no"
+      ></webview>
+
+      <div id="current-user">@...</div>
+
+      <div id="overlay">
+        <button class="overlay-btn" id="btn-inspect">🔍</button>
+        <button class="overlay-btn" id="btn-approve">+</button>
+        <button class="overlay-btn" id="btn-reject">−</button>
+      </div>
+
+      <div id="toast"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

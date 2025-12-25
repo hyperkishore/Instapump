@@ -1,0 +1,15 @@
+[7:35:00 PM] Video containers found: 15
+[7:35:00 PM] Found 15 presentations
+[7:35:00 PM] Found 3 links in reel
+[7:35:00 PM] Sample links: /_wanderjoy_/reels/ | /reels/audio/25327059840311838/ | /reels/audio/25327059840311838/
+[7:35:00 PM] Found username: _wanderjoy_
+[7:35:01 PM] Vid: 402x669 @-2007,0 playing:false
+[7:35:01 PM] Videos on page: 15
+[7:35:01 PM] Video containers found: 15
+[7:35:01 PM] Found 15 presentations
+[7:35:01 PM] Found 3 links in reel
+[7:35:01 PM] Sample links: /jesseitzler/reels/ | /reels/audio/25393922496924188/ | /reels/audio/25393922496924188/
+[7:35:01 PM] Found username: jesseitzler
+[7:35:01 PM] New user: @jesseitzler
+[7:35:01 PM] Allowlist raw: []
+[7:35:01 PM] Auto-logging OFF

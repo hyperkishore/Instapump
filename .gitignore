@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+
+# macOS
+.DS_Store
+*.swp
+
+# Logs
+*.log
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# Claude Code
+.claude/
