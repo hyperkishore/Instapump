@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.13
+// @version      2.1.14
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.13 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.14 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -404,46 +404,29 @@
     return null;
   }
 
-  // Username detection - find username from visible reel
+  // Username detection - find username from visible reel's clips overlay
   function detectUsername() {
     const excludeNames = ['reels', 'explore', 'p', 'reel', 'direct', 'stories', 'accounts', 'about', 'audio', 'music', 'tags', 'locations'];
 
-    // Find the visible clips overlay and search within its parent container
-    const visibleOverlay = getVisibleClipsOverlay();
-    // Go up to find a reasonable container (article or section)
-    const container = visibleOverlay?.closest('article') ||
-                      visibleOverlay?.closest('section') ||
-                      visibleOverlay?.parentElement?.parentElement?.parentElement;
+    // Find the visible clips overlay
+    const overlay = getVisibleClipsOverlay();
+    if (!overlay) return null;
 
-    const searchScope = container || document;
-
-    // Method 1: Look for aria-label containing "reels" (most reliable)
-    const ariaLinks = searchScope.querySelectorAll('a[aria-label*="reels"]');
-    for (const link of ariaLinks) {
+    // Search WITHIN the clips overlay for the username link
+    // The link has aria-label="username reels" format
+    const link = overlay.querySelector('a[aria-label$=" reels"]');
+    if (link) {
       const label = link.getAttribute('aria-label') || '';
-      // aria-label format: "username reels"
       const match = label.match(/^([a-zA-Z0-9._]+)\s+reels$/i);
       if (match && !excludeNames.includes(match[1].toLowerCase())) {
         return match[1].toLowerCase();
       }
     }
 
-    // Method 2: Look for username links
-    const links = searchScope.querySelectorAll('a[href^="/"]');
-    for (const link of links) {
-      const href = link.href || '';
-      const match = href.match(/instagram\.com\/([a-zA-Z0-9._]+)\/?$/);
-      if (match && !excludeNames.includes(match[1])) {
-        const text = link.textContent?.trim() || '';
-        if (text && text.length < 30 && !text.includes('Home') && !text.includes('Explore')) {
-          return match[1].toLowerCase();
-        }
-      }
-    }
-
-    // Method 3: Any valid username link in scope
-    for (const link of links) {
-      const href = link.href || '';
+    // Fallback: search for any username link within overlay
+    const links = overlay.querySelectorAll('a[href^="/"]');
+    for (const fallbackLink of links) {
+      const href = fallbackLink.href || '';
       const match = href.match(/instagram\.com\/([a-zA-Z0-9._]+)\/?$/);
       if (match && !excludeNames.includes(match[1])) {
         return match[1].toLowerCase();
@@ -1030,7 +1013,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.13';
+    version.textContent = 'v2.1.14';
     document.body.appendChild(version);
 
     // Status border
@@ -1273,7 +1256,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.13 loaded - Fixed username detection via clips overlay');
+    log('InstaPump v2.1.14 loaded - Username detection via aria-label inside clips overlay');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
