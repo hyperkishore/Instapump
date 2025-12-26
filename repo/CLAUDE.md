@@ -24,15 +24,16 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.20
+## Current Version: 2.1.22
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
 - **FAB Menu**: Tap = toggle mode, Long-press = show menu
-- **Swipe Gestures**: Right = approve, Left = reject (resumes video after)
+- **Swipe Gestures**: Right = approve, Left = reject (simulates tap to resume)
 - **List Viewer**: View/manage whitelist and blocklist (📝 button)
 - **List Count Display**: Shows `W:# B:#` below version badge
 - **Auto-Advance**: Moves to next video when current one finishes
+- **URL Bar Auto-Hide**: Triggers Safari URL bar collapse on load
 - **Element Picker**: Session-based picking with JSON export
 - **Tap Inspector**: Debug tool to analyze element stacks at tap points
 - **Logs Panel**: Debug logs with Export JSON/Copy/Clear
@@ -79,9 +80,27 @@ window.instapump.clearLists()
 
 ## Version History (Recent)
 
-### v2.1.20 - Resume video after swipe
+### v2.1.22 - URL bar hide + navigation debugging
+- Added `hideUrlBar()` - triggers `window.scrollTo(0, 1)` on load
+- Safari collapses URL bar when page scrolls
+- Added detailed logging to `navigateReel()` for debugging
+- Multi-method scroll fallback when stuck at end:
+  1. `window.scrollBy()` on window
+  2. `scrollContainer.scrollBy()` on main element
+  3. Simulated touch events on overlay
+
+### v2.1.21 - Simulate tap to resume after swipe
+- Removed aggressive `e.preventDefault()` and `e.stopPropagation()`
+- Changed touchend back to `{ passive: true }`
+- After swipe, simulate tap on clips overlay to resume video
+- Uses Instagram's own play/pause mechanism instead of fighting it
+
+**Root cause analysis:** v2.1.17's `stopPropagation()` was breaking Instagram's gesture recognition. Instagram paused on touchstart, but blocking touchend prevented Instagram from completing its gesture handling properly.
+
+### v2.1.20 - Resume video after swipe (superseded by v2.1.21)
 - Instagram pauses on touchstart, we detect swipe on touchend
 - After swipe detected, call video.play() to resume playback
+- **Issue:** video.play() was being overridden by Instagram's handlers
 
 ### v2.1.19 - Fixed auto-advance video detection
 - Added isVisibleVideo() using bounding rect check
@@ -278,6 +297,22 @@ function safeHide(el) {
 
 ---
 
+## URL Bar Auto-Hide
+
+Safari on iOS hides the URL bar when the page scrolls. We trigger this on load:
+
+```javascript
+function hideUrlBar() {
+  setTimeout(() => {
+    window.scrollTo(0, 1);
+  }, 100);
+}
+```
+
+Called in `init()` to give users a cleaner full-screen experience.
+
+---
+
 ## Navigation
 
 **Instagram Reels uses clips overlays, NOT articles.**
@@ -285,11 +320,21 @@ function safeHide(el) {
 ```javascript
 function navigateReel(direction) {
   const overlays = document.querySelectorAll('[id^="clipsoverlay"]');
+  log(`navigateReel(${direction}): found ${overlays.length} overlays`);
   // Find most visible overlay, scroll to next/prev
 }
 ```
 
-Fallback: `window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })`
+**Multi-method fallback when stuck at end:**
+1. `window.scrollBy({ top: vh, behavior: 'smooth' })`
+2. `scrollContainer.scrollBy()` on main element (100ms delay)
+3. Simulated touch events on current overlay (200ms delay)
+
+**Debugging stuck navigation:**
+- Open logs panel (📋)
+- Navigate (swipe up or ↓ key)
+- Check logs for overlay count and current index
+- If `Current overlay: 0/0`, Instagram only loaded 1 overlay
 
 ---
 
@@ -310,15 +355,27 @@ Automatically moves to next video when current finishes:
 
 **Problem:** Instagram pauses video on touchstart, we detect swipe on touchend.
 
-**Solution:** After detecting swipe, resume video:
+**Failed approaches (v2.1.17-v2.1.20):**
+- `e.preventDefault()` + `e.stopPropagation()` → Broke Instagram's gesture recognition
+- Direct `video.play()` → Instagram's handlers overrode it
+
+**Working solution (v2.1.21+):** Simulate a tap on clips overlay after swipe:
 ```javascript
-const video = document.querySelector('video');
-if (video && video.paused) {
-  video.play().catch(() => {});
-}
+document.addEventListener('touchend', (e) => {
+  // ... swipe detection ...
+  if (isHorizontalSwipe) {
+    // Don't block events - let Instagram complete its handling
+    // Then simulate a tap to toggle play back on
+    setTimeout(() => {
+      const overlay = getVisibleClipsOverlay();
+      if (overlay) overlay.click();
+    }, 50);
+    // Handle approve/reject...
+  }
+}, { passive: true }); // Don't fight Instagram
 ```
 
-Also: `e.preventDefault()` and `e.stopPropagation()` to prevent further handling.
+**Key insight:** Work WITH Instagram's mechanisms, not against them.
 
 ---
 
