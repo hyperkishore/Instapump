@@ -29,25 +29,39 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
 - **FAB Menu**: Tap = toggle mode, Long-press = show menu
-- **Swipe Gestures**: Right = approve, Left = reject
+- **Swipe Gestures**: Right = approve, Left = reject (resumes video after)
+- **List Viewer**: View/manage whitelist and blocklist (📝 button)
+- **List Count Display**: Shows `W:# B:#` below version badge
+- **Auto-Advance**: Moves to next video when current one finishes
 - **Element Picker**: Session-based picking with JSON export
 - **Tap Inspector**: Debug tool to analyze element stacks at tap points
 - **Logs Panel**: Debug logs with Export JSON/Copy/Clear
 - **Pattern-Based Hiding**: Auto-hides UI elements across all videos
 - **Clips Overlay Protection**: Audio toggle always works (protected layer)
+- **Version Badge**: Shows current version in top-right corner
 
 ### Keyboard Shortcuts
 | Key | Action |
 |-----|--------|
-| `<` / `>` | Reject / Approve |
-| `^` / `v` / `j` / `k` | Navigate reels |
+| `→` / `←` | Approve / Reject |
+| `↓` / `↑` / `j` / `k` | Navigate reels |
 | `M` | Toggle mode |
 | `P` | Toggle picker |
 | `L` | Toggle logs |
 
+### FAB Menu Buttons
+| Icon | Action |
+|------|--------|
+| `D` / `W` | Current mode (tap to toggle, long-press for menu) |
+| 📝 | List viewer panel |
+| ✂ | Element picker |
+| 📋 | Logs panel |
+| 👁 | Toggle hiding (green=on, red=off) |
+| 🔍 | Tap inspector |
+
 ### Storage Keys (localStorage)
-- `instapump_allowlist` - Approved accounts
-- `instapump_blocklist` - Rejected accounts
+- `instapump_allowlist` - Approved accounts (persists across refreshes)
+- `instapump_blocklist` - Rejected accounts (persists across refreshes)
 - `instapump_mode` - Current mode (discovery/whitelist)
 - `instapump_hiding` - Hiding enabled/disabled
 
@@ -60,6 +74,69 @@ window.instapump.getAllowlist()
 window.instapump.getBlocklist()
 window.instapump.clearLists()
 ```
+
+---
+
+## Version History (Recent)
+
+### v2.1.20 - Resume video after swipe
+- Instagram pauses on touchstart, we detect swipe on touchend
+- After swipe detected, call video.play() to resume playback
+
+### v2.1.19 - Fixed auto-advance video detection
+- Added isVisibleVideo() using bounding rect check
+- Video must cover >50% viewport to be considered active
+
+### v2.1.18 - Auto-advance to next video
+- Tracks videos with WeakSet
+- Listens for 'ended' event and 'timeupdate' near end
+- Only advances if video is visible
+
+### v2.1.17 - Fixed swipe causing video pause
+- Added preventDefault() and stopPropagation() on swipe detect
+- Changed touchend to passive: false
+
+### v2.1.16 - List count display and viewer panel
+- W:# B:# count below version badge
+- 📝 button opens list viewer with tabs
+- Remove button to delete accounts from lists
+
+### v2.1.15 - Fixed navigation to use clips overlays
+- Instagram has no `<article>` elements
+- navigateReel() now uses `[id^="clipsoverlay"]`
+
+### v2.1.14 - Username detection via aria-label
+- Search WITHIN clips overlay for `a[aria-label$=" reels"]`
+- Parse "username reels" format
+
+### v2.1.12-stable - Tagged stable version
+- Audio toggle working
+- UI hiding working
+- Git tag: `v2.1.12-stable`
+
+---
+
+## Username Detection
+
+Instagram Reels username is found via:
+
+```
+DOM Structure:
+SPAN (textContent: "username")
+  → DIV
+    → A (aria-label: "username reels", role: "link")  ← KEY ELEMENT
+      → DIV
+        → DIV
+          → DIV
+            → DIV (role: "button")  ← Clips overlay
+```
+
+**Detection Method:**
+1. Find visible clips overlay (>50% viewport)
+2. Search within: `overlay.querySelector('a[aria-label$=" reels"]')`
+3. Parse aria-label: `"username reels"` → extract `username`
+
+**Key insight:** `insideArticle: false` - Instagram Reels has NO article elements.
 
 ---
 
@@ -166,8 +243,9 @@ Selector: Small elements at bottom-right corner
 
 1. **Video elements**: `<video>` tags and containers
 2. **Clips Overlay**: `id.startsWith('clipsoverlay')` - handles audio toggle
-3. **Video containers**: Elements with class `x1ej3kyw`
-4. **InstaPump UI**: Elements with `id.startsWith('instapump')`
+3. **Elements containing clips overlay**: `el.querySelector('[id^="clipsoverlay"]')`
+4. **Video containers**: Elements with class `x1ej3kyw` or containing video
+5. **InstaPump UI**: Elements with `id.startsWith('instapump')`
 
 ### Clips Overlay Details
 ```
@@ -183,7 +261,64 @@ Identifying characteristics:
 - Contains all UI elements as children
 
 CRITICAL: Never hide this element or audio toggle breaks!
+Also: Never hide PARENTS of this element!
 ```
+
+### safeHide() Protection Logic
+```javascript
+function safeHide(el) {
+  if (!el) return false;
+  if (isInstaPumpElement(el)) return false;
+  if (isVideoContainer(el)) return false;
+  if (isClipsOverlay(el)) return false;
+  if (el.querySelector('[id^="clipsoverlay"]')) return false; // Contains overlay
+  // ... proceed to hide
+}
+```
+
+---
+
+## Navigation
+
+**Instagram Reels uses clips overlays, NOT articles.**
+
+```javascript
+function navigateReel(direction) {
+  const overlays = document.querySelectorAll('[id^="clipsoverlay"]');
+  // Find most visible overlay, scroll to next/prev
+}
+```
+
+Fallback: `window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })`
+
+---
+
+## Auto-Advance
+
+Automatically moves to next video when current finishes:
+
+1. Track all videos with WeakSet
+2. Listen for 'ended' event (non-looping videos)
+3. Listen for 'timeupdate' and detect when near end (<0.5s left)
+4. Check `isVisibleVideo()` - video covers >50% viewport
+5. Use data attribute flag to prevent duplicate advances
+6. Call `navigateReel('next')` after 500ms delay
+
+---
+
+## Swipe Gestures
+
+**Problem:** Instagram pauses video on touchstart, we detect swipe on touchend.
+
+**Solution:** After detecting swipe, resume video:
+```javascript
+const video = document.querySelector('video');
+if (video && video.paused) {
+  video.play().catch(() => {});
+}
+```
+
+Also: `e.preventDefault()` and `e.stopPropagation()` to prevent further handling.
 
 ---
 
@@ -194,21 +329,23 @@ CRITICAL: Never hide this element or audio toggle breaks!
 - Pattern-based hiding using position + content, not class names
 - Session-based element picker for discovering new patterns
 - Clips overlay protected at multiple levels (safeHide + pickerClick)
+- Navigation via clips overlays, not articles
+- Video visibility check via bounding rect, not DOM structure
 
 ## File Structure
 ```
 repo/userscript/
-+-- instapump.user.js      # Main userscript
-+-- *.txt                  # Log files
-+-- *.png                  # Screenshots
-+-- *.sh                   # Helper scripts
+├── instapump.user.js      # Main userscript
+├── *.txt                  # Log files
+├── *.png                  # Screenshots
+└── *.sh                   # Helper scripts
 ```
 
 ## Debugging Tools
 
 ### Tap Inspector
 1. Open FAB menu (long-press D/W button)
-2. Tap magnifying glass icon
+2. Tap magnifying glass icon 🔍
 3. Tap anywhere on screen
 4. View element stack in logs panel
 
@@ -219,10 +356,16 @@ Shows:
 
 ### Element Picker
 1. Open FAB menu
-2. Tap scissors icon
+2. Tap scissors icon ✂
 3. Single-tap to highlight element
 4. Double-tap to hide and capture data
 5. Export JSON for pattern analysis
+
+### List Viewer
+1. Open FAB menu
+2. Tap 📝 icon
+3. Switch between Whitelist/Blocked tabs
+4. Tap × to remove accounts
 
 ### Safari Dev Tools
 - Connect iPhone to Mac
