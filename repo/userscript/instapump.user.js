@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.16
+// @version      2.1.17
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.16 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.17 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -1234,7 +1234,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.16';
+    version.textContent = 'v2.1.17';
     document.body.appendChild(version);
 
     // List count badge
@@ -1461,7 +1461,7 @@
 
     // Touch swipe support
     document.addEventListener('touchstart', (e) => {
-      if (e.target.closest('#instapump-fab, #instapump-logs')) return;
+      if (e.target.closest('#instapump-fab, #instapump-logs, #instapump-list-panel')) return;
       swipeStartX = e.touches[0].clientX;
       swipeStartY = e.touches[0].clientY;
       swiping = true;
@@ -1474,6 +1474,9 @@
       const deltaX = touch.clientX - swipeStartX;
       const deltaY = touch.clientY - swipeStartY;
       if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2) {
+        // Prevent Instagram from seeing this as a tap (which pauses video)
+        e.preventDefault();
+        e.stopPropagation();
         if (deltaX > 0) {
           showSwipeIndicator('approve');
           approveAccount();
@@ -1482,7 +1485,7 @@
           rejectAccount();
         }
       }
-    }, { passive: true });
+    }, { passive: false }); // passive: false to allow preventDefault
   }
 
   // Keyboard shortcuts
@@ -1515,7 +1518,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.16 loaded - Added list count display and list viewer panel');
+    log('InstaPump v2.1.17 loaded - Fixed swipe causing video pause');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
