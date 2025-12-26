@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.19
+// @version      2.1.20
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.19 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.20 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -1293,7 +1293,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.19';
+    version.textContent = 'v2.1.20';
     document.body.appendChild(version);
 
     // List count badge
@@ -1536,6 +1536,13 @@
         // Prevent Instagram from seeing this as a tap (which pauses video)
         e.preventDefault();
         e.stopPropagation();
+
+        // Resume video if Instagram paused it on touchstart
+        const video = document.querySelector('video');
+        if (video && video.paused) {
+          video.play().catch(() => {}); // Ignore autoplay errors
+        }
+
         if (deltaX > 0) {
           showSwipeIndicator('approve');
           approveAccount();
@@ -1581,7 +1588,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
-    log('InstaPump v2.1.19 loaded - Fixed auto-advance video detection');
+    log('InstaPump v2.1.20 loaded - Resume video after swipe');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
