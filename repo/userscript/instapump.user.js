@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.15
+// @version      2.1.16
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.15 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.16 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -221,6 +221,121 @@
       z-index: 999999;
       pointer-events: none;
       text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    /* List count badge */
+    #instapump-list-count {
+      position: fixed;
+      top: 26px;
+      right: 10px;
+      color: #34c759;
+      font-size: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      opacity: 0.8;
+      z-index: 999999;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    /* List viewer panel */
+    #instapump-list-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      max-height: 70%;
+      background: rgba(0,0,0,0.95);
+      border-radius: 16px;
+      z-index: 1000001;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    #instapump-list-panel.visible { display: flex; }
+    #instapump-list-panel .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #instapump-list-panel .panel-header h3 {
+      margin: 0;
+      color: white;
+      font-size: 16px;
+    }
+    #instapump-list-panel .panel-close {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    #instapump-list-panel .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid #333;
+    }
+    #instapump-list-panel .panel-tab {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #instapump-list-panel .panel-tab.active {
+      color: white;
+      border-bottom: 2px solid #34c759;
+    }
+    #instapump-list-panel .panel-tab.blocked.active {
+      border-bottom-color: #ff3b30;
+    }
+    #instapump-list-panel .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    #instapump-list-panel .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      background: rgba(255,255,255,0.05);
+    }
+    #instapump-list-panel .list-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    #instapump-list-panel .list-item .username {
+      color: white;
+      font-size: 14px;
+    }
+    #instapump-list-panel .list-item .remove-btn {
+      background: rgba(255,59,48,0.2);
+      border: none;
+      color: #ff3b30;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #instapump-list-panel .empty-message {
+      color: #666;
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 13px;
     }
 
     /* Logs panel */
@@ -452,6 +567,7 @@
     }
     showToast('Approved @' + currentUsername);
     updateStatusBorder();
+    updateListCount();
   }
 
   function rejectAccount() {
@@ -469,6 +585,7 @@
     }
     showToast('Rejected @' + currentUsername);
     updateStatusBorder();
+    updateListCount();
   }
 
   // Navigation - use clips overlays instead of articles
@@ -1021,6 +1138,91 @@
     if (panel) panel.classList.remove('visible');
   }
 
+  // List count display
+  function updateListCount() {
+    const countEl = document.getElementById('instapump-list-count');
+    if (!countEl) return;
+    const wCount = getAllowlist().length;
+    const bCount = getBlocklist().length;
+    countEl.textContent = `W:${wCount} B:${bCount}`;
+  }
+
+  // List panel
+  let currentListTab = 'whitelist';
+
+  function showListPanel() {
+    const panel = document.getElementById('instapump-list-panel');
+    if (panel) {
+      panel.classList.add('visible');
+      renderListPanel();
+    }
+  }
+
+  function hideListPanel() {
+    const panel = document.getElementById('instapump-list-panel');
+    if (panel) panel.classList.remove('visible');
+  }
+
+  function renderListPanel() {
+    const content = document.getElementById('instapump-list-content');
+    const wlCount = document.getElementById('instapump-wl-count');
+    const blCount = document.getElementById('instapump-bl-count');
+    if (!content) return;
+
+    const allowlist = getAllowlist();
+    const blocklist = getBlocklist();
+
+    // Update tab counts
+    if (wlCount) wlCount.textContent = allowlist.length;
+    if (blCount) blCount.textContent = blocklist.length;
+
+    // Update tab active states
+    document.querySelectorAll('#instapump-list-panel .panel-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.tab === currentListTab);
+    });
+
+    // Render list
+    const list = currentListTab === 'whitelist' ? allowlist : blocklist;
+    const listType = currentListTab;
+
+    if (list.length === 0) {
+      content.innerHTML = `<div class="empty-message">No ${listType === 'whitelist' ? 'whitelisted' : 'blocked'} accounts yet.<br><br>${listType === 'whitelist' ? 'Swipe right to approve accounts.' : 'Swipe left to block accounts.'}</div>`;
+      return;
+    }
+
+    content.innerHTML = list.map(username => `
+      <div class="list-item" data-username="${username}" data-list="${listType}">
+        <span class="username">@${username}</span>
+        <button class="remove-btn" title="Remove">×</button>
+      </div>
+    `).join('');
+
+    // Add click handlers for remove buttons
+    content.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const item = e.target.closest('.list-item');
+        const username = item.dataset.username;
+        const listType = item.dataset.list;
+        removeFromList(username, listType);
+      });
+    });
+  }
+
+  function removeFromList(username, listType) {
+    if (listType === 'whitelist') {
+      const list = getAllowlist().filter(u => u !== username);
+      saveAllowlist(list);
+      showToast(`Removed @${username} from whitelist`);
+    } else {
+      const list = getBlocklist().filter(u => u !== username);
+      saveBlocklist(list);
+      showToast(`Removed @${username} from blocklist`);
+    }
+    renderListPanel();
+    updateListCount();
+    updateStatusBorder();
+  }
+
   // Create UI
   function createUI() {
     console.log('🔧 createUI called, body exists:', !!document.body);
@@ -1032,8 +1234,14 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.15';
+    version.textContent = 'v2.1.16';
     document.body.appendChild(version);
+
+    // List count badge
+    const listCount = document.createElement('div');
+    listCount.id = 'instapump-list-count';
+    document.body.appendChild(listCount);
+    updateListCount();
 
     // Status border
     const status = document.createElement('div');
@@ -1047,6 +1255,7 @@
     fab.innerHTML = `
       <button id="instapump-fab-main" class="${currentMode}">${currentMode === 'discovery' ? 'D' : 'W'}</button>
       <div id="instapump-fab-menu">
+        <button class="instapump-fab-btn" id="instapump-btn-lists" title="View Lists" style="background: linear-gradient(135deg, #007aff, #5856d6);">📝</button>
         <button class="instapump-fab-btn" id="instapump-btn-picker" title="Element Picker">✂</button>
         <button class="instapump-fab-btn" id="instapump-btn-logs" title="Logs">📋</button>
         <button class="instapump-fab-btn" id="instapump-btn-hide" title="Toggle Hiding" style="background: linear-gradient(135deg, ${hidingEnabled ? '#34c759, #30d158' : '#ff3b30, #ff453a'});">${hidingEnabled ? '👁' : '👁‍🗨'}</button>
@@ -1088,6 +1297,22 @@
     `;
     document.body.appendChild(logsPanel);
 
+    // List viewer panel
+    const listPanel = document.createElement('div');
+    listPanel.id = 'instapump-list-panel';
+    listPanel.innerHTML = `
+      <div class="panel-header">
+        <h3>Account Lists</h3>
+        <button class="panel-close" id="instapump-list-close">×</button>
+      </div>
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-tab="whitelist">Whitelist (<span id="instapump-wl-count">0</span>)</button>
+        <button class="panel-tab blocked" data-tab="blocklist">Blocked (<span id="instapump-bl-count">0</span>)</button>
+      </div>
+      <div class="panel-content" id="instapump-list-content"></div>
+    `;
+    document.body.appendChild(listPanel);
+
     // FAB interactions
     const fabMain = document.getElementById('instapump-fab-main');
     let fabPressTimer = null;
@@ -1112,6 +1337,11 @@
       if (fabMenuOpen && !e.target.closest('#instapump-fab')) closeFabMenu();
     });
 
+    document.getElementById('instapump-btn-lists').addEventListener('click', () => {
+      closeFabMenu();
+      showListPanel();
+    });
+
     document.getElementById('instapump-btn-picker').addEventListener('click', () => {
       closeFabMenu();
       togglePicker();
@@ -1120,6 +1350,16 @@
     document.getElementById('instapump-btn-logs').addEventListener('click', () => {
       closeFabMenu();
       showLogsPanel();
+    });
+
+    // List panel interactions
+    document.getElementById('instapump-list-close').addEventListener('click', hideListPanel);
+
+    document.querySelectorAll('#instapump-list-panel .panel-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        currentListTab = tab.dataset.tab;
+        renderListPanel();
+      });
     });
 
     document.getElementById('instapump-btn-hide').addEventListener('click', () => {
@@ -1275,7 +1515,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.15 loaded - Fixed navigation to use clips overlays');
+    log('InstaPump v2.1.16 loaded - Added list count display and list viewer panel');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
