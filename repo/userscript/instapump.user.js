@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.18
+// @version      2.1.19
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.18 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.19 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -591,6 +591,21 @@
   // Auto-advance: track videos and move to next when finished
   const trackedVideos = new WeakSet();
 
+  // Check if a video is the currently visible/active one
+  function isVisibleVideo(video) {
+    const rect = video.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const vw = window.innerWidth;
+
+    // Check if video is mostly visible (covers significant portion of viewport)
+    const visibleTop = Math.max(rect.top, 0);
+    const visibleBottom = Math.min(rect.bottom, vh);
+    const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+    // Video should cover at least 50% of viewport height and be reasonably wide
+    return visibleHeight > vh * 0.5 && rect.width > vw * 0.5;
+  }
+
   function setupVideoAutoAdvance() {
     const videos = document.querySelectorAll('video');
     videos.forEach(video => {
@@ -599,34 +614,34 @@
 
       // When video ends, go to next (if this is the visible video)
       video.addEventListener('ended', () => {
-        // Check if this video is in the visible clips overlay
-        const visibleOverlay = getVisibleClipsOverlay();
-        if (visibleOverlay && visibleOverlay.contains(video)) {
-          log('Video ended, advancing to next');
+        if (isVisibleVideo(video)) {
+          log('Video ended event, advancing to next');
           setTimeout(() => navigateReel('next'), 300);
         }
       });
 
-      // For looping videos, detect when near end
+      // Detect video completion (works even if Instagram loops programmatically)
       video.addEventListener('timeupdate', () => {
-        // If video loops, this helps detect completion
-        // Check if we're in the last 0.5 seconds and video is about to loop
-        if (video.loop && video.duration > 0) {
-          const timeLeft = video.duration - video.currentTime;
-          if (timeLeft < 0.3 && timeLeft > 0) {
-            const visibleOverlay = getVisibleClipsOverlay();
-            if (visibleOverlay && visibleOverlay.contains(video)) {
-              // Mark that we've triggered advance for this play-through
-              if (!video.dataset.advanceTriggered) {
-                video.dataset.advanceTriggered = 'true';
-                log('Video looping, advancing to next');
-                setTimeout(() => navigateReel('next'), 300);
-              }
+        // Only process if video has valid duration
+        if (!video.duration || video.duration === Infinity) return;
+
+        const timeLeft = video.duration - video.currentTime;
+
+        // When video is near the end (last 0.5 seconds)
+        if (timeLeft < 0.5 && timeLeft >= 0 && video.currentTime > 1) {
+          if (isVisibleVideo(video)) {
+            // Only trigger once per play-through
+            if (!video.dataset.advanceTriggered) {
+              video.dataset.advanceTriggered = 'true';
+              log(`Video near end (${video.currentTime.toFixed(1)}/${video.duration.toFixed(1)}), advancing`);
+              setTimeout(() => navigateReel('next'), 500);
             }
-          } else if (timeLeft > 1) {
-            // Reset the flag when video restarts
-            delete video.dataset.advanceTriggered;
           }
+        }
+
+        // Reset flag when video restarts (currentTime goes back to beginning)
+        if (video.currentTime < 1 && video.dataset.advanceTriggered) {
+          delete video.dataset.advanceTriggered;
         }
       });
     });
@@ -1278,7 +1293,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.18';
+    version.textContent = 'v2.1.19';
     document.body.appendChild(version);
 
     // List count badge
@@ -1566,7 +1581,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
-    log('InstaPump v2.1.18 loaded - Auto-advance to next video when finished');
+    log('InstaPump v2.1.19 loaded - Fixed auto-advance video detection');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }

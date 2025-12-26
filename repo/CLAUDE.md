@@ -24,7 +24,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.18
+## Current Version: 2.1.19
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
