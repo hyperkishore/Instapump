@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.14
+// @version      2.1.15
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.14 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.15 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -471,24 +471,43 @@
     updateStatusBorder();
   }
 
-  // Navigation
+  // Navigation - use clips overlays instead of articles
   function navigateReel(direction) {
-    const articles = Array.from(document.querySelectorAll('article'));
-    if (articles.length === 0) return;
+    // Instagram Reels uses clips overlays, not articles
+    const overlays = Array.from(document.querySelectorAll('[id^="clipsoverlay"]'));
+    if (overlays.length === 0) {
+      // Fallback: try scrolling by viewport height
+      const scrollAmount = direction === 'next' ? window.innerHeight : -window.innerHeight;
+      window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+      return;
+    }
+
+    // Find the currently visible overlay
     let currentIdx = 0;
     let maxVisible = 0;
-    articles.forEach((article, idx) => {
-      const rect = article.getBoundingClientRect();
-      const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+    const vh = window.innerHeight;
+
+    overlays.forEach((overlay, idx) => {
+      const rect = overlay.getBoundingClientRect();
+      const visibleTop = Math.max(rect.top, 0);
+      const visibleBottom = Math.min(rect.bottom, vh);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
       if (visibleHeight > maxVisible) {
         maxVisible = visibleHeight;
         currentIdx = idx;
       }
     });
+
+    // Navigate to next/prev
     let targetIdx = direction === 'next' ? currentIdx + 1 : currentIdx - 1;
-    targetIdx = Math.max(0, Math.min(targetIdx, articles.length - 1));
-    if (articles[targetIdx]) {
-      articles[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    targetIdx = Math.max(0, Math.min(targetIdx, overlays.length - 1));
+
+    if (overlays[targetIdx] && targetIdx !== currentIdx) {
+      overlays[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (direction === 'next') {
+      // At the end, scroll down to trigger loading more
+      window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
     }
   }
 
@@ -1013,7 +1032,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.14';
+    version.textContent = 'v2.1.15';
     document.body.appendChild(version);
 
     // Status border
@@ -1256,7 +1275,7 @@
     const observer = new MutationObserver(hideElements);
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
-    log('InstaPump v2.1.14 loaded - Username detection via aria-label inside clips overlay');
+    log('InstaPump v2.1.15 loaded - Fixed navigation to use clips overlays');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
