@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.20
+// @version      2.1.22
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.20 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.22 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -651,8 +651,11 @@
   function navigateReel(direction) {
     // Instagram Reels uses clips overlays, not articles
     const overlays = Array.from(document.querySelectorAll('[id^="clipsoverlay"]'));
+    log(`navigateReel(${direction}): found ${overlays.length} overlays`);
+
     if (overlays.length === 0) {
       // Fallback: try scrolling by viewport height
+      log('No overlays found, using scroll fallback');
       const scrollAmount = direction === 'next' ? window.innerHeight : -window.innerHeight;
       window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
       return;
@@ -675,15 +678,50 @@
       }
     });
 
+    log(`Current overlay: ${currentIdx}/${overlays.length - 1}`);
+
     // Navigate to next/prev
     let targetIdx = direction === 'next' ? currentIdx + 1 : currentIdx - 1;
     targetIdx = Math.max(0, Math.min(targetIdx, overlays.length - 1));
 
     if (overlays[targetIdx] && targetIdx !== currentIdx) {
+      log(`Scrolling to overlay ${targetIdx}`);
       overlays[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else if (direction === 'next') {
-      // At the end, scroll down to trigger loading more
+      // At the end or only one overlay - use multiple scroll methods
+      log('At end or single overlay, triggering scroll to load more');
+
+      // Method 1: scrollBy on window
       window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+
+      // Method 2: Also try scrolling the main scrollable container
+      setTimeout(() => {
+        const scrollContainer = document.querySelector('main') || document.scrollingElement || document.body;
+        scrollContainer.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+      }, 100);
+
+      // Method 3: Simulate a swipe down gesture on the current overlay
+      setTimeout(() => {
+        const overlay = overlays[currentIdx];
+        if (overlay) {
+          const rect = overlay.getBoundingClientRect();
+          // Dispatch touch events to simulate scroll
+          const touchStart = new TouchEvent('touchstart', {
+            bubbles: true,
+            cancelable: true,
+            touches: [new Touch({ identifier: 1, target: overlay, clientX: rect.left + 50, clientY: rect.top + 200 })]
+          });
+          const touchEnd = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true,
+            changedTouches: [new Touch({ identifier: 1, target: overlay, clientX: rect.left + 50, clientY: rect.top + 100 })]
+          });
+          overlay.dispatchEvent(touchStart);
+          overlay.dispatchEvent(touchEnd);
+        }
+      }, 200);
+    } else {
+      log(`Already at ${direction === 'next' ? 'last' : 'first'} overlay`);
     }
   }
 
@@ -1293,7 +1331,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.20';
+    version.textContent = 'v2.1.22';
     document.body.appendChild(version);
 
     // List count badge
@@ -1533,15 +1571,16 @@
       const deltaX = touch.clientX - swipeStartX;
       const deltaY = touch.clientY - swipeStartY;
       if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2) {
-        // Prevent Instagram from seeing this as a tap (which pauses video)
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Resume video if Instagram paused it on touchstart
-        const video = document.querySelector('video');
-        if (video && video.paused) {
-          video.play().catch(() => {}); // Ignore autoplay errors
-        }
+        // Don't block event propagation - let Instagram complete its gesture handling
+        // Instead, simulate a tap on clips overlay to toggle play back on
+        // (Instagram pauses on touchstart, one tap will unpause)
+        setTimeout(() => {
+          const overlay = getVisibleClipsOverlay();
+          if (overlay) {
+            overlay.click();
+            log('Simulated tap on clips overlay to resume');
+          }
+        }, 50);
 
         if (deltaX > 0) {
           showSwipeIndicator('approve');
@@ -1551,7 +1590,7 @@
           rejectAccount();
         }
       }
-    }, { passive: false }); // passive: false to allow preventDefault
+    }, { passive: true }); // Back to passive - don't fight Instagram
   }
 
   // Keyboard shortcuts
@@ -1576,11 +1615,22 @@
     }
   }
 
+  // Hide Safari URL bar by triggering a small scroll
+  function hideUrlBar() {
+    // Safari hides URL bar when page scrolls
+    // Scroll to 1px then back to trigger the hide
+    setTimeout(() => {
+      window.scrollTo(0, 1);
+      log('Triggered URL bar hide');
+    }, 100);
+  }
+
   // Init
   function init() {
     injectCSS();
     hideElements();
     createUI();
+    hideUrlBar(); // Trigger URL bar hide on load
     const observer = new MutationObserver(() => {
       hideElements();
       setupVideoAutoAdvance(); // Track new videos for auto-advance
@@ -1588,7 +1638,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
-    log('InstaPump v2.1.20 loaded - Resume video after swipe');
+    log('InstaPump v2.1.22 loaded - URL bar hide + navigation debug');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
