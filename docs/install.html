@@ -561,28 +561,36 @@
     <button class="toolbar-dismiss" id="dismiss-step2">Got it</button>
   </div>
 
-  <!-- Step 3: Arrow pointing to puzzle piece icon (bottom toolbar) -->
+  <!-- Step 3: Overlay telling user to switch tabs -->
   <div class="toolbar-arrow-overlay" id="toolbar-overlay">
-    <div class="step3-content">
-      <div class="toolbar-arrow-text">
-        In the new tab, tap the <strong>Userscripts icon</strong> in Safari's bottom toolbar
-      </div>
-      <div class="toolbar-arrow-subtext">
-        Look for the puzzle piece icon
-      </div>
-      <div class="toolbar-arrow-icon">
+    <div class="step3-content" style="margin-top: 80px;">
+      <div class="toolbar-arrow-icon" style="margin: 0 auto 24px; width: 70px; height: 70px;">
         <svg viewBox="0 0 24 24">
           <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
         </svg>
       </div>
-      <p class="toolbar-arrow-subtext" style="margin-top: 20px;">
-        Then tap <strong>"Install"</strong> in the popup
-      </p>
+      <div class="toolbar-arrow-text" style="font-size: 24px; margin-bottom: 16px;">
+        Script opened in new tab!
+      </div>
+      <div class="toolbar-arrow-subtext" style="font-size: 16px; line-height: 1.6;">
+        Switch to that tab, then:
+      </div>
+      <div class="step2-instructions" style="margin-top: 24px; text-align: left; max-width: 320px; margin-left: auto; margin-right: auto;">
+        <div class="step2-instruction">
+          <span class="step2-num">1</span>
+          <span>Tap <strong>aA</strong> → <strong>Manage Extensions</strong></span>
+        </div>
+        <div class="step2-instruction">
+          <span class="step2-num">2</span>
+          <span>Toggle <strong>Userscripts</strong> ON</span>
+        </div>
+        <div class="step2-instruction">
+          <span class="step2-num">3</span>
+          <span>Tap <strong>puzzle icon</strong> → <strong>Install</strong></span>
+        </div>
+      </div>
     </div>
-    <div class="step3-bottom-arrow">
-      <div class="toolbar-arrow">↓</div>
-    </div>
-    <button class="toolbar-dismiss" id="dismiss-overlay">Got it, I'll tap the icon</button>
+    <button class="toolbar-dismiss" id="dismiss-overlay">Got it</button>
   </div>
 
   <!-- Header -->
@@ -845,13 +853,29 @@
     const step3Overlay = document.getElementById('toolbar-overlay');
     const dismissStep3Btn = document.getElementById('dismiss-overlay');
     const iosDownloadBtn = document.getElementById('ios-download-btn');
+    const macDownloadBtn = document.getElementById('mac-download-btn');
 
     if (iosDownloadBtn) {
       iosDownloadBtn.addEventListener('click', function(e) {
-        // Show overlay after a short delay to let download start
+        e.preventDefault();
+        // Open in background tab
+        const scriptUrl = this.href;
+        window.open(scriptUrl, '_blank');
+        // Try to keep focus on this page
+        window.focus();
+        // Show overlay after a short delay
         setTimeout(() => {
           step3Overlay.classList.add('visible');
-        }, 500);
+        }, 300);
+      });
+    }
+
+    if (macDownloadBtn) {
+      macDownloadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const scriptUrl = this.href;
+        window.open(scriptUrl, '_blank');
+        window.focus();
       });
     }
 
