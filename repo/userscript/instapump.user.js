@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.40
+// @version      2.1.41
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,10 +16,13 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.40';
+  const VERSION = '2.1.41';
+
+  // Check if loaded via loader (loader manages updates)
+  const LOADED_VIA_LOADER = window.__instapump_loader === true;
 
   // TEST: Confirm script is loading
-  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...`);
+  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${LOADED_VIA_LOADER ? ' (via loader)' : ''}`);
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -1596,8 +1599,10 @@
     });
     document.body.appendChild(versionBadge);
 
-    // Check for updates after 3 seconds (let the page settle)
-    setTimeout(checkForUpdates, 3000);
+    // Check for updates after 3 seconds (skip if loader is managing updates)
+    if (!LOADED_VIA_LOADER) {
+      setTimeout(checkForUpdates, 3000);
+    }
 
     // Username display
     const usernameDisplay = document.createElement('div');

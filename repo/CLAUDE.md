@@ -577,3 +577,66 @@ npm install
 npm start        # Standard run
 npm run dev      # With logging enabled
 ```
+
+---
+
+## Auto-Update Architecture (Loader Pattern)
+
+For Safari Userscripts app users, we use a **loader pattern** for seamless auto-updates:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  FILESYSTEM (iCloud/Userscripts folder)                     │
+│  ┌─────────────────────────────────────┐                    │
+│  │  instapump-loader.user.js           │                    │
+│  │  - Tiny loader (~150 lines)         │  ← NEVER CHANGES   │
+│  │  - Installed once                   │                    │
+│  └─────────────────────────────────────┘                    │
+└─────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  LOCALSTORAGE (browser, instagram.com domain)               │
+│  ┌─────────────────────────────────────┐                    │
+│  │  instapump_cached_code              │                    │
+│  │  - Full script (~2000 lines)        │  ← AUTO-UPDATES    │
+│  │  - Fetched from GitHub              │                    │
+│  │  instapump_cached_version           │                    │
+│  └─────────────────────────────────────┘                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### How It Works
+
+1. **First Load (no cache)**:
+   - Loader fetches full script from GitHub
+   - Saves to localStorage
+   - Executes immediately
+
+2. **Subsequent Loads (cached)**:
+   - Loader runs cached code instantly (fast!)
+   - Background fetch checks for updates
+   - If newer version found → saves to localStorage + shows toast
+   - Next refresh applies the update
+
+3. **Offline Mode**:
+   - Runs cached version (works fine)
+   - Update check silently fails (no error)
+
+### Two Installation Methods
+
+| Method | File | Auto-Updates | Best For |
+|--------|------|--------------|----------|
+| **Loader** | `instapump-loader.user.js` | ✅ Yes | Safari Userscripts app |
+| **Standalone** | `instapump.user.js` | Via @updateURL | Tampermonkey, Greasemonkey |
+
+### Key Files
+
+- `instapump-loader.user.js` - Tiny loader, user installs this once
+- `instapump.user.js` - Full script, fetched/cached by loader
+
+### Flags
+
+- `window.__instapump_loader` - Set by loader, signals main script to skip its own update check
+- `window.__instapump_loaded` - Prevents double execution
+- `LOADED_VIA_LOADER` - Constant in main script to check loader status
