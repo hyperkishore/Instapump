@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.39
+// @version      2.1.40
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.39';
+  const VERSION = '2.1.40';
 
   // TEST: Confirm script is loading
   console.log(`🚀 INSTAPUMP ${VERSION} LOADING...`);
@@ -72,6 +72,16 @@
   const sessionHiddenElements = []; // Array of {element, data} objects
   const sessionElementData = []; // JSON data for export
 
+  // SVG Icons (flat, minimal style - Instagram inspired)
+  const ICONS = {
+    lists: '<svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>',
+    picker: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',
+    logs: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>',
+    eyeOn: '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    eyeOff: '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
+    inspect: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>'
+  };
+
   // CSS - Carefully adding back UI hiding
   const HIDE_CSS = `
     /* Hide bottom navigation bar */
@@ -116,67 +126,93 @@
       right: 16px;
       display: flex;
       flex-direction: column-reverse;
-      align-items: center;
-      gap: 12px;
+      align-items: flex-end;
+      gap: 8px;
       z-index: 999999;
     }
 
-    /* Main FAB */
+    /* Main FAB - Instagram gradient style */
     #instapump-fab-main {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
       border: none;
       cursor: pointer;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      font-size: 18px;
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      transition: transform 0.2s, background 0.3s;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
       -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      letter-spacing: -0.5px;
     }
-    #instapump-fab-main:active { transform: scale(0.95); }
-    #instapump-fab-main.discovery { background: linear-gradient(135deg, #007aff, #5856d6); }
-    #instapump-fab-main.whitelist { background: linear-gradient(135deg, #34c759, #30d158); }
+    #instapump-fab-main:active {
+      transform: scale(0.92);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+    }
+    #instapump-fab-main.discovery {
+      background: linear-gradient(135deg, #405DE6, #5851DB, #833AB4);
+    }
+    #instapump-fab-main.whitelist {
+      background: linear-gradient(135deg, #C13584, #E1306C, #FD1D1D);
+    }
 
     /* FAB Menu */
     #instapump-fab-menu {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      align-items: flex-end;
+      gap: 6px;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(10px) scale(0.95);
       pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #instapump-fab-menu.open {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
       pointer-events: auto;
     }
 
     .instapump-fab-btn {
       width: 44px;
       height: 44px;
-      border-radius: 50%;
+      border-radius: 12px;
       border: none;
       cursor: pointer;
-      font-size: 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      transition: transform 0.15s;
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
       -webkit-tap-highlight-color: transparent;
+      background: rgba(38, 38, 40, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    .instapump-fab-btn:active { transform: scale(0.9); }
-    #instapump-btn-picker { background: linear-gradient(135deg, #ff9500, #ff3b30); }
-    #instapump-btn-logs { background: linear-gradient(135deg, #5856d6, #af52de); }
+    .instapump-fab-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .instapump-fab-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: white;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    #instapump-btn-lists { background: linear-gradient(135deg, #405DE6, #5851DB); }
+    #instapump-btn-picker { background: linear-gradient(135deg, #F77737, #FCAF45); }
+    #instapump-btn-logs { background: linear-gradient(135deg, #833AB4, #C13584); }
+    #instapump-btn-hide.enabled { background: linear-gradient(135deg, #C13584, #E1306C); }
+    #instapump-btn-hide.disabled { background: rgba(58, 58, 60, 0.95); }
+    #instapump-btn-inspect { background: linear-gradient(135deg, #5851DB, #833AB4); }
 
     /* Toast */
     #instapump-toast {
@@ -1581,17 +1617,17 @@
     document.body.appendChild(status);
     console.log('✅ Status border created');
 
-    // FAB container
+    // FAB container - Instagram-style with flat SVG icons
     const fab = document.createElement('div');
     fab.id = 'instapump-fab';
     fab.innerHTML = `
       <button id="instapump-fab-main" class="${currentMode}">${currentMode === 'discovery' ? 'D' : 'W'}</button>
       <div id="instapump-fab-menu">
-        <button class="instapump-fab-btn" id="instapump-btn-lists" title="View Lists" style="background: linear-gradient(135deg, #007aff, #5856d6);">📝</button>
-        <button class="instapump-fab-btn" id="instapump-btn-picker" title="Element Picker">✂</button>
-        <button class="instapump-fab-btn" id="instapump-btn-logs" title="Logs">📋</button>
-        <button class="instapump-fab-btn" id="instapump-btn-hide" title="Toggle Hiding" style="background: linear-gradient(135deg, ${hidingEnabled ? '#34c759, #30d158' : '#ff3b30, #ff453a'});">${hidingEnabled ? '👁' : '👁‍🗨'}</button>
-        <button class="instapump-fab-btn" id="instapump-btn-inspect" title="Tap Inspector" style="background: linear-gradient(135deg, #5856d6, #6e6ce3);">🔍</button>
+        <button class="instapump-fab-btn" id="instapump-btn-lists" title="View Lists">${ICONS.lists}</button>
+        <button class="instapump-fab-btn" id="instapump-btn-picker" title="Element Picker">${ICONS.picker}</button>
+        <button class="instapump-fab-btn" id="instapump-btn-logs" title="Logs">${ICONS.logs}</button>
+        <button class="instapump-fab-btn ${hidingEnabled ? 'enabled' : 'disabled'}" id="instapump-btn-hide" title="Toggle Hiding">${hidingEnabled ? ICONS.eyeOn : ICONS.eyeOff}</button>
+        <button class="instapump-fab-btn" id="instapump-btn-inspect" title="Tap Inspector">${ICONS.inspect}</button>
       </div>
     `;
     document.body.appendChild(fab);
@@ -1700,14 +1736,16 @@
       localStorage.setItem('instapump_hiding', hidingEnabled ? 'true' : 'false');
       const btn = document.getElementById('instapump-btn-hide');
       if (hidingEnabled) {
-        btn.style.background = 'linear-gradient(135deg, #34c759, #30d158)';
-        btn.textContent = '👁';
+        btn.classList.remove('disabled');
+        btn.classList.add('enabled');
+        btn.innerHTML = ICONS.eyeOn;
         showToast('Hiding ON');
         hideElements(); // Re-apply hiding
       } else {
-        btn.style.background = 'linear-gradient(135deg, #ff3b30, #ff453a)';
-        btn.textContent = '👁‍🗨';
-        showToast('Hiding OFF - All elements visible');
+        btn.classList.remove('enabled');
+        btn.classList.add('disabled');
+        btn.innerHTML = ICONS.eyeOff;
+        showToast('Hiding OFF');
         // Restore all hidden elements without refresh
         document.querySelectorAll('[data-instapump-hidden]').forEach(el => {
           el.style.display = '';
