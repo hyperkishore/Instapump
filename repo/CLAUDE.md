@@ -52,7 +52,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.37
+## Current Version: 2.1.44
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
@@ -163,6 +163,23 @@ applyModeFilter(@username)
 ---
 
 ## Version History (Recent)
+
+### v2.1.44 - Restore missing findVisibleVideo helper
+- Added back `findVisibleVideo()` helper function removed during v2.1.43 cleanup
+- Fixed hardcoded version string in log (was "v2.1.38", now uses VERSION constant)
+
+### v2.1.43 - Restore FAB functionality after UI redesign
+- Restored `tryOverlayClick()` function that was accidentally removed in v2.1.42
+- Restored proper `resumeVideoAfterSwipe()` with fallback logic:
+  1. Try `video.play()` first
+  2. Fall back to `overlay.click()` if video still paused after 100ms
+  3. Added 300ms verification check with retry
+- Fixed FAB tap/long-press functionality broken by UI changes
+
+### v2.1.42 - FAB UI redesign (minimal black/white)
+- Redesigned FAB to minimal aesthetic
+- Black background with white text
+- Introduced bugs fixed in v2.1.43-v2.1.44
 
 ### v2.1.32 - Video resume after horizontal swipe
 - Added `resumeVideoAfterSwipe()` function
@@ -664,3 +681,104 @@ For Safari Userscripts app users, we use a **loader pattern** for seamless auto-
 - `window.__instapump_loader` - Set by loader, signals main script to skip its own update check
 - `window.__instapump_loaded` - Prevents double execution
 - `LOADED_VIA_LOADER` - Constant in main script to check loader status
+
+---
+
+## Website & Landing Page
+
+### Live URL
+**https://hyperkishore.github.io/Instapump**
+
+GitHub Pages serves from the `/docs` folder at repo root.
+
+### File Structure
+```
+/docs/                          # GitHub Pages root (NOT repo/docs/)
+├── index.html                  # Landing page
+├── install.html                # Step-by-step install guide
+├── style.css                   # Apple-inspired dark theme
+└── script.js                   # Rotating heroes, live counter, animations
+```
+
+### Movement Branding: Algorithm Atheists
+
+**Identity:** "The Attention Reclamation Project"
+
+**Movement Name:** Algorithm Atheists
+- "We don't believe in algorithmic gods"
+- Counter-position against Big Tech attention merchants
+
+**Key Phrases:**
+- "We don't negotiate with algorithms." (Primary tagline)
+- "My attention isn't for sale."
+- "I opt out."
+- "I choose my feed."
+- "I'm not a product."
+
+**Origin Story (The Realization):**
+> "I spent 3 hours watching Reels from accounts I never chose to follow. The algorithm knew exactly what would keep me hooked.
+>
+> That's when I understood: I wasn't the customer. I was the product.
+>
+> I built InstaPump to become the customer again."
+
+### Landing Page Structure
+
+1. **Hero Section** - Rotating headlines based on visit count
+   - 5 hero variants stored in `heroes[]` array
+   - Uses localStorage `instapump_visit_count` for rotation
+
+2. **Origin Story** - Personal confession/transformation
+
+3. **The Problem** - 4 cards explaining algorithm manipulation
+   - "It learns your triggers"
+   - "It optimizes for their profit"
+   - "It exploits slot machine psychology"
+   - "It's invisible" (always last, has "Until now")
+
+4. **The Flip** - Before/After comparison
+   - Their Instagram vs Your Instagram
+   - Strikethrough on "before" items
+
+5. **How It Works** - Three gestures (Swipe Left/Right, Scroll)
+
+6. **Algorithm Atheists** - Identity statements
+   - 4 rotating statement cards (shuffled per visit)
+
+7. **The Mission** - Live counter from GitHub
+   - Fetches stars + forks + watchers as "people who opted out"
+   - Animated counter on page load
+
+8. **Install CTA** - Links to install.html
+
+### Install Page Flow
+
+**Simplified 3-step flow:**
+
+1. **Get the App** - Link to Userscripts app on App Store
+2. **Enable Extension** - Settings → Safari → Extensions → Enable
+3. **Install Script** - Download button + animated arrow overlay
+
+**Animated Arrow Overlay:**
+When user clicks "Download InstaPump", shows overlay pointing to Safari toolbar:
+- Arrow pointing up (↑)
+- "Now tap the Userscripts icon in Safari's toolbar"
+- Puzzle piece icon
+- "Got it" dismiss button
+
+This guides users through the Userscripts popup install flow, which is simpler than "Save to Files".
+
+### Key Technical Notes
+
+- **GitHub Pages path:** Files must be at root `/docs/` not `repo/docs/`
+- **Userscripts popup install:** Visiting .user.js URL + tapping extension icon shows "Install" button
+- **Live counter:** `fetchGitHubStats()` calls GitHub API for repo engagement metrics
+- **Visit-based variation:** Hero headlines, statement cards, and problem cards shuffle based on localStorage visit count
+
+### Design Principles
+
+1. **Apple-inspired aesthetic** - Dark theme, plenty of whitespace, SF Pro/Inter fonts
+2. **Single clear message per section** - No clutter
+3. **Movement-based marketing** - Users join a tribe, not just download software
+4. **Counter-positioning** - "Algorithm" is the enemy, user autonomy is the hero
+5. **Specificity over vagueness** - Real numbers, concrete transformations
