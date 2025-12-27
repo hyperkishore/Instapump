@@ -24,7 +24,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.22
+## Current Version: 2.1.32
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
@@ -79,6 +79,37 @@ window.instapump.clearLists()
 ---
 
 ## Version History (Recent)
+
+### v2.1.32 - Video resume after horizontal swipe
+- Added `resumeVideoAfterSwipe()` function
+- Detects horizontal swipe and calls resume logic
+- Multi-method resume: video.play() first, then overlay.click() fallback
+- Added 300ms check to verify video resumed, retries if still paused
+- Comprehensive logging to debug resume behavior
+
+### v2.1.30 - Fixed navigation with scrollIntoView
+- Changed navigation from `scrollBy` to `scrollIntoView` on target overlay
+- Find current visible overlay by index, scroll to next/prev
+- Auto-advance now working correctly
+
+### v2.1.29 - Debounced auto-advance
+- Fixed triple-scroll issue (timeupdate + ended + seeking all firing)
+- Added `debounceAdvance()` function with 1 second cooldown
+
+### v2.1.27 - Fixed duration detection
+- Fixed NaN duration by checking `isNaN(video.duration)`
+- Better logging for video metadata with `loadedmetadata` event
+
+### v2.1.25 - Auto-advance improvements
+- Added loop detection via 'seeking' event
+- Tighter threshold (0.3s instead of 0.5s)
+
+### v2.1.24 - Viewport resize handling
+- Added `handleViewportResize()` to re-align videos when viewport changes
+- Handles Safari toolbar hide/show
+
+### v2.1.23 - Simplified navigation
+- Uses `scrollBy` with scroll-snap for alignment
 
 ### v2.1.22 - URL bar hide + navigation debugging
 - Added `hideUrlBar()` - triggers `window.scrollTo(0, 1)` on load

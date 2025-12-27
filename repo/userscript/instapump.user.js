@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.30
+// @version      2.1.32
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.30 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.32 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -498,6 +498,66 @@
     fabMenuOpen = false;
     const menu = document.getElementById('instapump-fab-menu');
     if (menu) menu.classList.remove('open');
+  }
+
+  // Resume video after horizontal swipe
+  // Instagram pauses on touchstart, we need to resume after detecting horizontal swipe
+  function resumeVideoAfterSwipe() {
+    // Strategy: Try multiple methods with logging to understand what works
+
+    // Method 1: Find visible video and call play() directly
+    const videos = document.querySelectorAll('video');
+    let visibleVideo = null;
+
+    for (const video of videos) {
+      if (isVisibleVideo(video)) {
+        visibleVideo = video;
+        break;
+      }
+    }
+
+    if (visibleVideo) {
+      log(`Resume attempt: video.paused=${visibleVideo.paused}, readyState=${visibleVideo.readyState}`);
+
+      if (visibleVideo.paused) {
+        // Try video.play() first
+        visibleVideo.play()
+          .then(() => {
+            log('Resume SUCCESS via video.play()');
+          })
+          .catch((err) => {
+            log(`Resume FAILED via video.play(): ${err.message}`);
+            // Method 2: Try clicking the overlay
+            tryOverlayClick();
+          });
+      } else {
+        log('Video already playing, no resume needed');
+      }
+    } else {
+      log('No visible video found, trying overlay click');
+      tryOverlayClick();
+    }
+
+    // Check state after delay
+    setTimeout(() => {
+      if (visibleVideo) {
+        log(`After 300ms: video.paused=${visibleVideo.paused}`);
+        if (visibleVideo.paused) {
+          log('Video still paused after resume attempt - trying overlay click');
+          tryOverlayClick();
+        }
+      }
+    }, 300);
+  }
+
+  function tryOverlayClick() {
+    const overlay = getVisibleClipsOverlay();
+    if (overlay) {
+      log('Clicking overlay to toggle play...');
+      overlay.click();
+    } else {
+      log('No overlay found for click');
+    }
   }
 
   // Find the currently visible clips overlay (the main reel container)
@@ -1365,7 +1425,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.30';
+    version.textContent = 'v2.1.32';
     document.body.appendChild(version);
 
     // List count badge
@@ -1604,7 +1664,11 @@
       const touch = e.changedTouches[0];
       const deltaX = touch.clientX - swipeStartX;
       const deltaY = touch.clientY - swipeStartY;
-      if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2) {
+      const isHorizontalSwipe = Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2;
+
+      if (isHorizontalSwipe) {
+        log(`Horizontal swipe detected: deltaX=${deltaX.toFixed(0)}`);
+
         if (deltaX > 0) {
           showSwipeIndicator('approve');
           approveAccount();
@@ -1612,6 +1676,12 @@
           showSwipeIndicator('reject');
           rejectAccount();
         }
+
+        // Instagram pauses on touchstart, resume after horizontal swipe
+        // Use setTimeout to let Instagram's handlers complete first
+        setTimeout(() => {
+          resumeVideoAfterSwipe();
+        }, 100);
       }
     }, { passive: true });
   }
@@ -1702,7 +1772,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
-    log('InstaPump v2.1.30 loaded - Fixed navigation with scrollIntoView');
+    log('InstaPump v2.1.32 loaded - Added video resume after horizontal swipe');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
