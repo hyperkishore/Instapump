@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Install InstaPump - 3 Easy Steps</title>
+  <title>Install InstaPump - 2 Easy Steps</title>
   <meta name="description" content="Install InstaPump in under 2 minutes. Works on iPhone, iPad, and Mac Safari.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -363,6 +363,105 @@
       border-color: var(--text-tertiary);
     }
 
+    /* Step 2 overlay - arrow to top-left aA button */
+    .step2-arrow-container {
+      position: absolute;
+      top: 40px;
+      left: 20px;
+      text-align: left;
+    }
+
+    .step2-arrow {
+      font-size: 80px;
+      color: var(--accent);
+      animation: point-topleft 1s ease-in-out infinite;
+      line-height: 1;
+    }
+
+    @keyframes point-topleft {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-10px, -10px); }
+    }
+
+    .step2-instructions {
+      margin-top: 180px;
+      padding: 0 24px;
+    }
+
+    .step2-instruction {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+
+    .step2-instruction:last-child {
+      border-bottom: none;
+    }
+
+    .step2-num {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    /* Step 3 overlay - arrow to bottom toolbar */
+    .step3-content {
+      text-align: center;
+      padding: 60px 24px 20px;
+    }
+
+    .step3-bottom-arrow {
+      position: fixed;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+
+    .step3-bottom-arrow .toolbar-arrow {
+      animation: bounce-down 1s ease-in-out infinite;
+    }
+
+    @keyframes bounce-down {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(15px); }
+    }
+
+    /* Show me button */
+    .show-me-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      margin-top: 16px;
+    }
+
+    .show-me-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+
     /* Visual instruction box */
     .visual-instruction {
       background: var(--bg-elevated);
@@ -437,23 +536,52 @@
   </style>
 </head>
 <body>
-  <!-- Toolbar Arrow Overlay -->
+  <!-- Step 2: Arrow pointing to aA button (top-left) -->
+  <div class="toolbar-arrow-overlay" id="step2-overlay">
+    <div class="step2-arrow-container">
+      <div class="toolbar-arrow-text" style="margin-bottom: 20px;">
+        Tap the <strong>aA button</strong> in Safari's address bar
+      </div>
+      <div class="step2-arrow">↖</div>
+    </div>
+    <div class="step2-instructions">
+      <div class="step2-instruction">
+        <span class="step2-num">1</span>
+        <span>Tap <strong>Manage Extensions</strong></span>
+      </div>
+      <div class="step2-instruction">
+        <span class="step2-num">2</span>
+        <span>Toggle <strong>Userscripts</strong> ON</span>
+      </div>
+      <div class="step2-instruction">
+        <span class="step2-num">3</span>
+        <span>Allow for <strong>All Websites</strong></span>
+      </div>
+    </div>
+    <button class="toolbar-dismiss" id="dismiss-step2">Got it</button>
+  </div>
+
+  <!-- Step 3: Arrow pointing to puzzle piece icon (bottom toolbar) -->
   <div class="toolbar-arrow-overlay" id="toolbar-overlay">
-    <div class="toolbar-arrow">↑</div>
-    <div class="toolbar-arrow-text">
-      Now tap the <strong>Userscripts icon</strong> in Safari's toolbar
+    <div class="step3-content">
+      <div class="toolbar-arrow-text">
+        Now tap the <strong>Userscripts icon</strong> in Safari's bottom toolbar
+      </div>
+      <div class="toolbar-arrow-subtext">
+        Look for the puzzle piece icon
+      </div>
+      <div class="toolbar-arrow-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
+        </svg>
+      </div>
+      <p class="toolbar-arrow-subtext" style="margin-top: 20px;">
+        Then tap <strong>"Install"</strong> in the popup
+      </p>
     </div>
-    <div class="toolbar-arrow-subtext">
-      Look for the puzzle piece icon
+    <div class="step3-bottom-arrow">
+      <div class="toolbar-arrow">↓</div>
     </div>
-    <div class="toolbar-arrow-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
-      </svg>
-    </div>
-    <p class="toolbar-arrow-subtext" style="margin-top: 30px;">
-      Then tap <strong>"Install"</strong> in the popup
-    </p>
     <button class="toolbar-dismiss" id="dismiss-overlay">Got it, I'll tap the icon</button>
   </div>
 
@@ -476,7 +604,7 @@
       Back to home
     </a>
     <h1>Install InstaPump</h1>
-    <p>Three steps. Under 2 minutes. Then you're free.</p>
+    <p>Two steps. Under 2 minutes. Then you're free.</p>
     <div class="time-estimate">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"/>
@@ -518,36 +646,11 @@
         <!-- Step 2 -->
         <div class="step">
           <div class="step-number">2</div>
-          <h2>Enable the Extension</h2>
+          <h2>Enable Extension & Install Script</h2>
           <p>
-            Allow Userscripts to run in Safari. This only takes a minute.
+            Tap download, then enable the extension and install—all from the same page.
           </p>
-          <ul class="step-substeps">
-            <li>
-              <span class="substep-icon">A</span>
-              <span>Open <strong>Settings</strong> → <strong>Safari</strong> → <strong>Extensions</strong></span>
-            </li>
-            <li>
-              <span class="substep-icon">B</span>
-              <span>Tap <strong>Userscripts</strong> and toggle it <strong>ON</strong></span>
-            </li>
-            <li>
-              <span class="substep-icon">C</span>
-              <span>Set permission to <strong>All Websites</strong></span>
-            </li>
-          </ul>
-          <div class="step-note">
-            <strong>Why "All Websites"?</strong> The extension needs permission to detect when you're on Instagram. It only activates on instagram.com.
-          </div>
-        </div>
 
-        <!-- Step 3 -->
-        <div class="step">
-          <div class="step-number">3</div>
-          <h2>Install InstaPump</h2>
-          <p>
-            Tap the button below, then tap the <strong>Userscripts icon</strong> in Safari's toolbar to install.
-          </p>
           <a href="https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump-loader.user.js"
              class="step-action"
              id="ios-download-btn">
@@ -559,17 +662,35 @@
             Download InstaPump
           </a>
 
-          <div class="visual-instruction">
-            <div class="visual-instruction-icon">
-              <svg viewBox="0 0 24 24" stroke-width="2">
-                <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
-              </svg>
-            </div>
-            <p>After tapping download, look for the <strong>puzzle piece icon</strong> in Safari's toolbar, tap it, then tap <strong>"Install"</strong></p>
-          </div>
+          <ul class="step-substeps" style="margin-top: 24px;">
+            <li>
+              <span class="substep-icon">A</span>
+              <span>Tap the <strong>aA button</strong> (top-left of Safari)</span>
+            </li>
+            <li>
+              <span class="substep-icon">B</span>
+              <span>Tap <strong>Manage Extensions</strong> → Toggle <strong>Userscripts ON</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">C</span>
+              <span>Allow for <strong>All Websites</strong>, then tap <strong>Done</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">D</span>
+              <span>Tap the <strong>puzzle piece icon</strong> (bottom toolbar) → <strong>Install</strong></span>
+            </li>
+          </ul>
 
-          <div class="step-note">
-            <strong>Don't see the icon?</strong> Tap the <strong>aA</strong> button in Safari's address bar, then tap "Userscripts".
+          <button class="show-me-btn" id="show-step2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            Show me where to tap
+          </button>
+
+          <div class="step-note" style="margin-top: 20px;">
+            <strong>Why "All Websites"?</strong> The extension needs to detect when you're on Instagram. It only activates on instagram.com.
           </div>
         </div>
 
@@ -598,33 +719,11 @@
         <!-- Step 2 -->
         <div class="step">
           <div class="step-number">2</div>
-          <h2>Enable the Extension</h2>
+          <h2>Enable Extension & Install Script</h2>
           <p>
-            Allow Userscripts to run in Safari.
+            Enable Userscripts in Safari, then install the script.
           </p>
-          <ul class="step-substeps">
-            <li>
-              <span class="substep-icon">A</span>
-              <span>Open <strong>Safari</strong> → <strong>Settings</strong> → <strong>Extensions</strong></span>
-            </li>
-            <li>
-              <span class="substep-icon">B</span>
-              <span>Check the box next to <strong>Userscripts</strong></span>
-            </li>
-            <li>
-              <span class="substep-icon">C</span>
-              <span>Allow it for <strong>instagram.com</strong> (or all websites)</span>
-            </li>
-          </ul>
-        </div>
 
-        <!-- Step 3 -->
-        <div class="step">
-          <div class="step-number">3</div>
-          <h2>Install InstaPump</h2>
-          <p>
-            Click the button below, then click the <strong>Userscripts icon</strong> in Safari's toolbar to install.
-          </p>
           <a href="https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump-loader.user.js"
              class="step-action"
              id="mac-download-btn">
@@ -636,14 +735,24 @@
             Download InstaPump
           </a>
 
-          <div class="visual-instruction">
-            <div class="visual-instruction-icon">
-              <svg viewBox="0 0 24 24" stroke-width="2">
-                <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
-              </svg>
-            </div>
-            <p>After clicking download, look for the <strong>puzzle piece icon</strong> in Safari's toolbar, click it, then click <strong>"Install"</strong></p>
-          </div>
+          <ul class="step-substeps" style="margin-top: 24px;">
+            <li>
+              <span class="substep-icon">A</span>
+              <span>Open <strong>Safari</strong> → <strong>Settings</strong> → <strong>Extensions</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">B</span>
+              <span>Check the box next to <strong>Userscripts</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">C</span>
+              <span>Allow for <strong>All Websites</strong> (or instagram.com)</span>
+            </li>
+            <li>
+              <span class="substep-icon">D</span>
+              <span>Click the <strong>puzzle piece icon</strong> in toolbar → <strong>Install</strong></span>
+            </li>
+          </ul>
         </div>
 
       </div>
@@ -702,27 +811,60 @@
       document.querySelector('[data-platform="mac"]').click();
     }
 
-    // Show toolbar arrow overlay when download is clicked (iOS only)
-    const overlay = document.getElementById('toolbar-overlay');
-    const dismissBtn = document.getElementById('dismiss-overlay');
+    // Step 2 overlay - "Show me where" button
+    const step2Overlay = document.getElementById('step2-overlay');
+    const showStep2Btn = document.getElementById('show-step2');
+    const dismissStep2Btn = document.getElementById('dismiss-step2');
 
-    document.getElementById('ios-download-btn').addEventListener('click', function(e) {
-      // Show overlay after a short delay to let download start
-      setTimeout(() => {
-        overlay.classList.add('visible');
-      }, 500);
-    });
+    if (showStep2Btn) {
+      showStep2Btn.addEventListener('click', function() {
+        step2Overlay.classList.add('visible');
+      });
+    }
 
-    dismissBtn.addEventListener('click', function() {
-      overlay.classList.remove('visible');
-    });
+    if (dismissStep2Btn) {
+      dismissStep2Btn.addEventListener('click', function() {
+        step2Overlay.classList.remove('visible');
+      });
+    }
 
-    // Also dismiss on tap outside
-    overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) {
-        overlay.classList.remove('visible');
-      }
-    });
+    // Dismiss Step 2 overlay on tap outside
+    if (step2Overlay) {
+      step2Overlay.addEventListener('click', function(e) {
+        if (e.target === step2Overlay) {
+          step2Overlay.classList.remove('visible');
+        }
+      });
+    }
+
+    // Step 3 overlay - Show after download click
+    const step3Overlay = document.getElementById('toolbar-overlay');
+    const dismissStep3Btn = document.getElementById('dismiss-overlay');
+    const iosDownloadBtn = document.getElementById('ios-download-btn');
+
+    if (iosDownloadBtn) {
+      iosDownloadBtn.addEventListener('click', function(e) {
+        // Show overlay after a short delay to let download start
+        setTimeout(() => {
+          step3Overlay.classList.add('visible');
+        }, 500);
+      });
+    }
+
+    if (dismissStep3Btn) {
+      dismissStep3Btn.addEventListener('click', function() {
+        step3Overlay.classList.remove('visible');
+      });
+    }
+
+    // Dismiss Step 3 overlay on tap outside
+    if (step3Overlay) {
+      step3Overlay.addEventListener('click', function(e) {
+        if (e.target === step3Overlay) {
+          step3Overlay.classList.remove('visible');
+        }
+      });
+    }
   </script>
 </body>
 </html>
