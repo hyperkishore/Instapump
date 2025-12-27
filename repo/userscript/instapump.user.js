@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.43
+// @version      2.1.44
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.43';
+  const VERSION = '2.1.44';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -719,6 +719,17 @@
     } else {
       log('No overlay found for click');
     }
+  }
+
+  // Find currently visible video (helper for debug logging)
+  function findVisibleVideo() {
+    const videos = document.querySelectorAll('video');
+    for (const video of videos) {
+      if (isVisibleVideo(video)) {
+        return video;
+      }
+    }
+    return null;
   }
 
   // Find the currently visible clips overlay (the main reel container)
@@ -1999,7 +2010,7 @@
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
     setupAllVideoLogging(); // Initial video logging setup
-    log('InstaPump v2.1.38 loaded - DEBUG: touch events, video events, load more');
+    log(`InstaPump v${VERSION} loaded`);
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
