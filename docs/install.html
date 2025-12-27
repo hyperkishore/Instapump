@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install InstaPump - 3 Easy Steps</title>
+  <meta name="description" content="Install InstaPump in under 2 minutes. Works on iPhone, iPad, and Mac Safari.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Install page specific styles */
+    .install-hero {
+      min-height: auto;
+      padding: 140px 24px 80px;
+      text-align: center;
+    }
+
+    .install-hero h1 {
+      font-size: clamp(32px, 6vw, 56px);
+      margin-bottom: 16px;
+    }
+
+    .install-hero p {
+      font-size: 20px;
+      color: var(--text-secondary);
+    }
+
+    .steps {
+      padding: 60px 24px 120px;
+    }
+
+    .steps-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .step-number {
+      position: absolute;
+      top: -20px;
+      left: 40px;
+      background: var(--accent);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .step h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      padding-right: 60px;
+    }
+
+    .step p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .step-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+
+    .step-action:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .step-action svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .step-note {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    .step-note strong {
+      color: var(--text-secondary);
+    }
+
+    .step-substeps {
+      margin: 20px 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .step-substeps li {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .step-substeps li:last-child {
+      border-bottom: none;
+    }
+
+    .substep-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      background: rgba(10, 132, 255, 0.2);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .step-image {
+      margin: 20px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .step-image img {
+      width: 100%;
+      display: block;
+    }
+
+    .step-image-placeholder {
+      background: var(--bg-elevated);
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+
+    .done-section {
+      text-align: center;
+      padding: 80px 24px;
+      background: var(--bg-elevated);
+    }
+
+    .done-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #34c759, #30d158);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 40px;
+    }
+
+    .done-section h2 {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .done-section p {
+      color: var(--text-secondary);
+      font-size: 18px;
+      margin-bottom: 32px;
+    }
+
+    .done-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .done-actions a {
+      padding: 16px 32px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+
+    .done-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .done-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .done-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .done-secondary:hover {
+      border-color: var(--text-tertiary);
+    }
+
+    .platform-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+
+    .platform-tab {
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .platform-tab:hover {
+      border-color: var(--text-tertiary);
+    }
+
+    .platform-tab.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .platform-content {
+      display: none;
+    }
+
+    .platform-content.active {
+      display: block;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
+    .time-estimate {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(52, 199, 89, 0.1);
+      color: #34c759;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .step {
+        padding: 32px 24px;
+      }
+
+      .step-number {
+        left: 24px;
+      }
+
+      .step h2 {
+        padding-right: 0;
+        font-size: 20px;
+      }
+
+      .done-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .done-actions a {
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <a href="index.html" class="header-logo" style="text-decoration: none;">THE ATTENTION RECLAMATION PROJECT</a>
+      <nav class="header-nav">
+        <a href="https://github.com/hyperkishore/Instapump" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="install-hero">
+    <a href="index.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to home
+    </a>
+    <h1>Install InstaPump</h1>
+    <p>Three steps. Under 2 minutes. Then you're free.</p>
+    <div class="time-estimate">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+      ~2 minutes
+    </div>
+  </section>
+
+  <!-- Platform Tabs -->
+  <section class="steps">
+    <div class="steps-content">
+
+      <div class="platform-tabs">
+        <button class="platform-tab active" data-platform="ios">iPhone / iPad</button>
+        <button class="platform-tab" data-platform="mac">Mac Safari</button>
+      </div>
+
+      <!-- iOS Instructions -->
+      <div class="platform-content active" id="ios-content">
+
+        <!-- Step 1 -->
+        <div class="step">
+          <div class="step-number">1</div>
+          <h2>Install the Userscripts App</h2>
+          <p>
+            Userscripts is a free app that lets Safari run custom scripts.
+            It's made by an indie developer and is completely safe.
+          </p>
+          <a href="https://apps.apple.com/app/userscripts/id1463298887" target="_blank" rel="noopener" class="step-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Open in App Store
+          </a>
+          <div class="step-note">
+            <strong>Free & Open Source.</strong> The app is trusted by thousands of users and doesn't collect any data.
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step">
+          <div class="step-number">2</div>
+          <h2>Download InstaPump Script</h2>
+          <p>
+            Tap the button below. When prompted, choose <strong>"Save to Files"</strong> and select the
+            <strong>Userscripts folder</strong> in iCloud Drive.
+          </p>
+          <a href="https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump-loader.user.js" class="step-action" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download InstaPump
+          </a>
+          <ul class="step-substeps">
+            <li>
+              <span class="substep-icon">A</span>
+              <span>Tap "Download InstaPump" above</span>
+            </li>
+            <li>
+              <span class="substep-icon">B</span>
+              <span>When the file opens, tap the <strong>Share</strong> button (box with arrow)</span>
+            </li>
+            <li>
+              <span class="substep-icon">C</span>
+              <span>Choose <strong>"Save to Files"</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">D</span>
+              <span>Navigate to <strong>iCloud Drive → Userscripts</strong> folder</span>
+            </li>
+            <li>
+              <span class="substep-icon">E</span>
+              <span>Tap <strong>"Save"</strong></span>
+            </li>
+          </ul>
+          <div class="step-note">
+            <strong>Can't find the Userscripts folder?</strong> Open the Userscripts app first—it creates the folder automatically.
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step">
+          <div class="step-number">3</div>
+          <h2>Enable in Safari Settings</h2>
+          <p>
+            Tell Safari to trust the Userscripts extension.
+          </p>
+          <ul class="step-substeps">
+            <li>
+              <span class="substep-icon">A</span>
+              <span>Open <strong>Settings</strong> app on your iPhone/iPad</span>
+            </li>
+            <li>
+              <span class="substep-icon">B</span>
+              <span>Scroll down and tap <strong>Safari</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">C</span>
+              <span>Tap <strong>Extensions</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">D</span>
+              <span>Tap <strong>Userscripts</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">E</span>
+              <span>Toggle it <strong>ON</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">F</span>
+              <span>Set "Allow" to <strong>All Websites</strong> (or just instagram.com)</span>
+            </li>
+          </ul>
+          <div class="step-note">
+            <strong>Why "All Websites"?</strong> Userscripts needs permission to run on Instagram.
+            InstaPump only activates on instagram.com—it ignores everything else.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mac Instructions -->
+      <div class="platform-content" id="mac-content">
+
+        <!-- Step 1 -->
+        <div class="step">
+          <div class="step-number">1</div>
+          <h2>Install the Userscripts App</h2>
+          <p>
+            Userscripts is a free Safari extension for Mac. Get it from the Mac App Store.
+          </p>
+          <a href="https://apps.apple.com/app/userscripts/id1463298887" target="_blank" rel="noopener" class="step-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            Open in Mac App Store
+          </a>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step">
+          <div class="step-number">2</div>
+          <h2>Download InstaPump Script</h2>
+          <p>
+            Click below to download, then move the file to your Userscripts folder.
+          </p>
+          <a href="https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump-loader.user.js" class="step-action" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download InstaPump
+          </a>
+          <ul class="step-substeps">
+            <li>
+              <span class="substep-icon">A</span>
+              <span>Click the download button above</span>
+            </li>
+            <li>
+              <span class="substep-icon">B</span>
+              <span>Open Finder and go to your <strong>Downloads</strong> folder</span>
+            </li>
+            <li>
+              <span class="substep-icon">C</span>
+              <span>Move the file to: <strong>iCloud Drive → Userscripts</strong></span>
+            </li>
+          </ul>
+          <div class="step-note">
+            <strong>Tip:</strong> Open the Userscripts app first—it will show you exactly where to put scripts.
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step">
+          <div class="step-number">3</div>
+          <h2>Enable in Safari</h2>
+          <p>
+            Allow the Userscripts extension to run.
+          </p>
+          <ul class="step-substeps">
+            <li>
+              <span class="substep-icon">A</span>
+              <span>Open <strong>Safari → Settings</strong> (or Preferences)</span>
+            </li>
+            <li>
+              <span class="substep-icon">B</span>
+              <span>Click the <strong>Extensions</strong> tab</span>
+            </li>
+            <li>
+              <span class="substep-icon">C</span>
+              <span>Check the box next to <strong>Userscripts</strong></span>
+            </li>
+            <li>
+              <span class="substep-icon">D</span>
+              <span>Click on Userscripts and set permissions for instagram.com</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Done Section -->
+  <section class="done-section">
+    <div class="done-icon">✓</div>
+    <h2>You're ready!</h2>
+    <p>Open Instagram Reels in Safari and start swiping.</p>
+    <div class="done-actions">
+      <a href="https://www.instagram.com/reels/" target="_blank" rel="noopener" class="done-primary">
+        Open Instagram Reels
+      </a>
+      <a href="index.html" class="done-secondary">
+        Back to Home
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <span class="footer-brand">THE ATTENTION RECLAMATION PROJECT</span>
+      <nav class="footer-nav">
+        <a href="https://github.com/hyperkishore/Instapump" target="_blank" rel="noopener">GitHub</a>
+        <span class="footer-dot"></span>
+        <a href="index.html">Home</a>
+      </nav>
+      <p class="footer-tagline">"I don't negotiate with algorithms."</p>
+    </div>
+  </footer>
+
+  <script>
+    // Platform tab switching
+    document.querySelectorAll('.platform-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update content
+        const platform = tab.dataset.platform;
+        document.querySelectorAll('.platform-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(`${platform}-content`).classList.add('active');
+      });
+    });
+
+    // Detect platform and auto-select
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    if (isMac && !isIOS) {
+      document.querySelector('[data-platform="mac"]').click();
+    }
+  </script>
+</body>
+</html>
