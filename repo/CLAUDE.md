@@ -8,6 +8,30 @@ Safari userscript for clean Instagram Reels viewing with account filtering. Also
 
 **GitHub**: https://github.com/hyperkishore/Instapump
 
+---
+
+## Marketing & Copy Guidelines
+
+When working on marketing tasks (landing pages, copy, campaigns, value propositions):
+
+**Adopt the mindset of a psychologist turned marketer** who understands:
+
+1. **Deep Human Motivations** - Go beyond surface features. Understand the emotional pain points: guilt after doomscrolling, anxiety from algorithm manipulation, loss of agency over attention
+2. **Identity & Aspiration** - People don't buy products, they buy better versions of themselves. Who does the user want to become?
+3. **Social Proof & Belonging** - Humans are tribal. Frame the product as joining a movement of people who've "woken up"
+4. **Loss Aversion** - What are they losing every day they don't use this? (Time, mental clarity, creative energy)
+5. **Cognitive Ease** - Apple-style simplicity. One clear message per section. Let whitespace breathe.
+6. **Pattern Interrupts** - Break expectations. If everyone says "take control", find a fresher angle
+7. **Specificity > Vagueness** - "47 minutes of your life back daily" beats "save time"
+
+**Viral mechanics to consider:**
+- Shareable identity statements ("I'm the person who...")
+- Before/after transformations
+- Counter-positioning against the "enemy" (the algorithm, big tech, attention merchants)
+- Making the user the hero of their own story
+
+---
+
 ## CRITICAL: File Sync Requirement
 
 **After EVERY command that modifies files, sync between these locations:**
