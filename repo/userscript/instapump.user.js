@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.25
+// @version      2.1.30
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -14,7 +14,7 @@
   'use strict';
 
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.25 LOADING...');
+  console.log('🚀 INSTAPUMP 2.1.30 LOADING...');
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -590,6 +590,19 @@
 
   // Auto-advance: track videos and move to next when finished
   const trackedVideos = new WeakSet();
+  let lastAdvanceTime = 0;
+  const ADVANCE_DEBOUNCE_MS = 1000; // Prevent multiple advances within 1 second
+
+  function debounceAdvance(reason) {
+    const now = Date.now();
+    if (now - lastAdvanceTime < ADVANCE_DEBOUNCE_MS) {
+      log(`Advance blocked (debounce): ${reason}`);
+      return false;
+    }
+    lastAdvanceTime = now;
+    log(`Advancing: ${reason}`);
+    return true;
+  }
 
   // Check if a video is the currently visible/active one
   function isVisibleVideo(video) {
@@ -612,16 +625,21 @@
       if (trackedVideos.has(video)) return; // Already tracking
       trackedVideos.add(video);
 
-      log(`Tracking video: duration=${video.duration?.toFixed(1) || 'unknown'}s, loop=${video.loop}`);
+      // Log initial state
+      const durStr = (video.duration && !isNaN(video.duration)) ? video.duration.toFixed(1) + 's' : 'loading...';
+      log(`Tracking video: duration=${durStr}, readyState=${video.readyState}`);
+
+      // When metadata loads, log the actual duration
+      video.addEventListener('loadedmetadata', () => {
+        log(`Video metadata loaded: duration=${video.duration?.toFixed(1)}s`);
+      });
 
       // When video ends, go to next (if this is the visible video)
       video.addEventListener('ended', () => {
-        log('Video ended event fired');
         if (isVisibleVideo(video)) {
-          log('Video is visible, advancing to next');
-          setTimeout(() => navigateReel('next'), 300);
-        } else {
-          log('Video not visible, skipping advance');
+          if (debounceAdvance('video ended')) {
+            setTimeout(() => navigateReel('next'), 300);
+          }
         }
       });
 
@@ -629,10 +647,11 @@
       video.addEventListener('seeking', () => {
         // If video was near end and suddenly seeks to beginning, it looped
         if (video.dataset.wasNearEnd === 'true' && video.currentTime < 1) {
-          log('Video looped (detected via seeking), advancing to next');
+          video.dataset.wasNearEnd = 'false';
           if (isVisibleVideo(video)) {
-            video.dataset.wasNearEnd = 'false';
-            setTimeout(() => navigateReel('next'), 300);
+            if (debounceAdvance('video looped')) {
+              setTimeout(() => navigateReel('next'), 300);
+            }
           }
         }
       });
@@ -640,10 +659,9 @@
       // Detect video near end
       video.addEventListener('timeupdate', () => {
         // Only process if video has valid duration
-        if (!video.duration || video.duration === Infinity) return;
+        if (!video.duration || video.duration === Infinity || isNaN(video.duration)) return;
 
         const timeLeft = video.duration - video.currentTime;
-        const progress = (video.currentTime / video.duration * 100).toFixed(0);
 
         // Mark as near end when in last 1 second
         if (timeLeft < 1 && timeLeft >= 0) {
@@ -656,8 +674,9 @@
             // Only trigger once per play-through
             if (!video.dataset.advanceTriggered) {
               video.dataset.advanceTriggered = 'true';
-              log(`Video at ${progress}% (${video.currentTime.toFixed(1)}/${video.duration.toFixed(1)}s), advancing`);
-              setTimeout(() => navigateReel('next'), 300);
+              if (debounceAdvance(`video at ${(video.currentTime / video.duration * 100).toFixed(0)}%`)) {
+                setTimeout(() => navigateReel('next'), 300);
+              }
             }
           }
         }
@@ -670,39 +689,87 @@
     });
   }
 
-  // Navigation - use simple scroll and let Instagram's scroll-snap handle alignment
+  // Navigation - find and scroll the correct container
   function navigateReel(direction) {
     const vh = window.innerHeight;
-    const scrollAmount = direction === 'next' ? vh : -vh;
+    const overlays = Array.from(document.querySelectorAll('[id^="clipsoverlay"]'));
 
-    // Find scrollable container - Instagram uses a specific scroll container
-    const scrollContainer = document.scrollingElement || document.documentElement;
+    log(`navigateReel(${direction}): ${overlays.length} overlays in DOM`);
 
-    log(`navigateReel(${direction}): scrolling by ${scrollAmount}px`);
+    if (overlays.length === 0) {
+      log('No overlays found, trying window scroll');
+      window.scrollBy({ top: direction === 'next' ? vh : -vh, behavior: 'smooth' });
+      return;
+    }
 
-    // Simple approach: scroll by viewport height, let CSS scroll-snap align
-    // Instagram's scroll-snap-type will snap to the nearest reel
-    scrollContainer.scrollBy({
-      top: scrollAmount,
-      behavior: 'smooth'
+    // Find current visible overlay
+    let currentIdx = -1;
+    let maxVisible = 0;
+
+    overlays.forEach((overlay, idx) => {
+      const rect = overlay.getBoundingClientRect();
+      const visibleTop = Math.max(rect.top, 0);
+      const visibleBottom = Math.min(rect.bottom, vh);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+      if (visibleHeight > maxVisible) {
+        maxVisible = visibleHeight;
+        currentIdx = idx;
+      }
     });
 
-    // Log overlay info for debugging
-    const overlays = document.querySelectorAll('[id^="clipsoverlay"]');
-    log(`Found ${overlays.length} overlays in DOM`);
+    log(`Current overlay index: ${currentIdx}`);
+
+    // Calculate target index
+    const targetIdx = direction === 'next' ? currentIdx + 1 : currentIdx - 1;
+
+    if (targetIdx >= 0 && targetIdx < overlays.length) {
+      // Scroll target overlay into view
+      const targetOverlay = overlays[targetIdx];
+      log(`Scrolling to overlay ${targetIdx} via scrollIntoView`);
+      targetOverlay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (direction === 'next') {
+      // At end, try to load more by scrolling
+      log('At end, scrolling to load more');
+
+      // Try multiple scroll methods
+      window.scrollBy({ top: vh, behavior: 'smooth' });
+
+      // Also try scrolling the main content area
+      const mainContent = document.querySelector('main') ||
+                          document.querySelector('[role="main"]') ||
+                          document.querySelector('section');
+      if (mainContent) {
+        mainContent.scrollBy({ top: vh, behavior: 'smooth' });
+      }
+    } else {
+      log('Already at first overlay');
+    }
   }
 
   // Mode filtering
   function applyModeFilter(username) {
+    const allowlist = getAllowlist();
+    const blocklist = getBlocklist();
+
+    log(`applyModeFilter: @${username}, mode=${currentMode}, inAllowlist=${allowlist.includes(username)}, inBlocklist=${blocklist.includes(username)}`);
+
     if (currentMode === 'discovery') {
-      if (getBlocklist().includes(username)) {
+      if (blocklist.includes(username)) {
+        log(`Discovery mode: @${username} is blocked, skipping...`);
         showToast('Skipping @' + username);
         setTimeout(() => navigateReel('next'), 300);
+      } else {
+        log(`Discovery mode: @${username} is allowed`);
       }
     } else {
-      if (!getAllowlist().includes(username)) {
+      // Whitelist mode
+      if (!allowlist.includes(username)) {
+        log(`Whitelist mode: @${username} NOT in allowlist, skipping...`);
         showToast('Not whitelisted: @' + username);
         setTimeout(() => navigateReel('next'), 300);
+      } else {
+        log(`Whitelist mode: @${username} is whitelisted, playing`);
       }
     }
   }
@@ -1298,7 +1365,7 @@
     // Version badge
     const version = document.createElement('div');
     version.id = 'instapump-version';
-    version.textContent = 'v2.1.25';
+    version.textContent = 'v2.1.30';
     document.body.appendChild(version);
 
     // List count badge
@@ -1538,17 +1605,6 @@
       const deltaX = touch.clientX - swipeStartX;
       const deltaY = touch.clientY - swipeStartY;
       if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2) {
-        // Don't block event propagation - let Instagram complete its gesture handling
-        // Instead, simulate a tap on clips overlay to toggle play back on
-        // (Instagram pauses on touchstart, one tap will unpause)
-        setTimeout(() => {
-          const overlay = getVisibleClipsOverlay();
-          if (overlay) {
-            overlay.click();
-            log('Simulated tap on clips overlay to resume');
-          }
-        }, 50);
-
         if (deltaX > 0) {
           showSwipeIndicator('approve');
           approveAccount();
@@ -1557,7 +1613,7 @@
           rejectAccount();
         }
       }
-    }, { passive: true }); // Back to passive - don't fight Instagram
+    }, { passive: true });
   }
 
   // Keyboard shortcuts
@@ -1577,6 +1633,7 @@
     const username = detectUsername();
     if (username && username !== currentUsername) {
       currentUsername = username;
+      log(`Detected user: @${username} (mode: ${currentMode})`);
       updateStatusBorder();
       applyModeFilter(username);
     }
@@ -1645,7 +1702,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
-    log('InstaPump v2.1.25 loaded - Improved auto-advance detection');
+    log('InstaPump v2.1.30 loaded - Fixed navigation with scrollIntoView');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }
