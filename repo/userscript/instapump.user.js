@@ -1,20 +1,25 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.32
+// @version      2.1.39
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
 // @match        https://instagram.com/*
 // @grant        none
 // @run-at       document-start
+// @updateURL    https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js
+// @downloadURL  https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js
 // ==/UserScript==
 
 (function() {
   'use strict';
 
+  // Version constant - update this when releasing new versions
+  const VERSION = '2.1.39';
+
   // TEST: Confirm script is loading
-  console.log('🚀 INSTAPUMP 2.1.32 LOADING...');
+  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...`);
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
@@ -214,6 +219,32 @@
       position: fixed;
       top: 10px;
       right: 10px;
+      color: white;
+      font-size: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      opacity: 0.7;
+      z-index: 999999;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      transition: all 0.3s ease;
+    }
+    #instapump-version.outdated {
+      color: #ff3b30;
+      opacity: 1;
+      animation: outdated-glow 1.5s ease-in-out infinite;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    @keyframes outdated-glow {
+      0%, 100% { text-shadow: 0 0 5px #ff3b30, 0 0 10px #ff3b30; }
+      50% { text-shadow: 0 0 10px #ff3b30, 0 0 20px #ff3b30, 0 0 30px #ff3b30; }
+    }
+
+    /* Username display */
+    #instapump-username {
+      position: fixed;
+      top: 10px;
+      left: 10px;
       color: white;
       font-size: 11px;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -438,6 +469,46 @@
     content.scrollTop = content.scrollHeight;
   }
 
+  // Version comparison helper (semver-like)
+  function isNewerVersion(latest, current) {
+    const latestParts = latest.split('.').map(Number);
+    const currentParts = current.split('.').map(Number);
+    for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+      const l = latestParts[i] || 0;
+      const c = currentParts[i] || 0;
+      if (l > c) return true;
+      if (l < c) return false;
+    }
+    return false;
+  }
+
+  // Check for updates from GitHub
+  async function checkForUpdates() {
+    try {
+      const response = await fetch('https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js', {
+        cache: 'no-store'
+      });
+      const text = await response.text();
+      // Parse version from userscript header
+      const versionMatch = text.match(/@version\s+(\d+\.\d+\.\d+)/);
+      if (versionMatch) {
+        const latestVersion = versionMatch[1];
+        log(`Version check: current=${VERSION}, latest=${latestVersion}`);
+        if (isNewerVersion(latestVersion, VERSION)) {
+          const versionEl = document.getElementById('instapump-version');
+          if (versionEl) {
+            versionEl.classList.add('outdated');
+            versionEl.title = `Update available: v${latestVersion} (tap to update)`;
+            versionEl.textContent = `v${VERSION} → v${latestVersion}`;
+            log(`⚠️ Update available: v${latestVersion}`);
+          }
+        }
+      }
+    } catch (err) {
+      console.log('[InstaPump] Update check failed:', err.message);
+    }
+  }
+
   // Toast
   function showToast(message) {
     let toast = document.getElementById('instapump-toast');
@@ -500,64 +571,92 @@
     if (menu) menu.classList.remove('open');
   }
 
-  // Resume video after horizontal swipe
-  // Instagram pauses on touchstart, we need to resume after detecting horizontal swipe
-  function resumeVideoAfterSwipe() {
-    // Strategy: Try multiple methods with logging to understand what works
+  // ==================== DETAILED DEBUG LOGGING ====================
 
-    // Method 1: Find visible video and call play() directly
-    const videos = document.querySelectorAll('video');
-    let visibleVideo = null;
+  // Track video events
+  const trackedVideoEvents = new WeakSet();
 
-    for (const video of videos) {
-      if (isVisibleVideo(video)) {
-        visibleVideo = video;
-        break;
-      }
-    }
+  function setupVideoEventLogging(video) {
+    if (trackedVideoEvents.has(video)) return;
+    trackedVideoEvents.add(video);
 
-    if (visibleVideo) {
-      log(`Resume attempt: video.paused=${visibleVideo.paused}, readyState=${visibleVideo.readyState}`);
+    const videoId = video.src?.slice(-20) || 'unknown';
 
-      if (visibleVideo.paused) {
-        // Try video.play() first
-        visibleVideo.play()
-          .then(() => {
-            log('Resume SUCCESS via video.play()');
-          })
-          .catch((err) => {
-            log(`Resume FAILED via video.play(): ${err.message}`);
-            // Method 2: Try clicking the overlay
-            tryOverlayClick();
-          });
-      } else {
-        log('Video already playing, no resume needed');
-      }
-    } else {
-      log('No visible video found, trying overlay click');
-      tryOverlayClick();
-    }
+    video.addEventListener('play', () => {
+      log(`[VIDEO EVENT] ▶️ play - video starting (paused=${video.paused})`);
+    });
 
-    // Check state after delay
-    setTimeout(() => {
-      if (visibleVideo) {
-        log(`After 300ms: video.paused=${visibleVideo.paused}`);
-        if (visibleVideo.paused) {
-          log('Video still paused after resume attempt - trying overlay click');
-          tryOverlayClick();
-        }
-      }
-    }, 300);
+    video.addEventListener('pause', () => {
+      log(`[VIDEO EVENT] ⏸️ pause - video paused (paused=${video.paused})`);
+    });
+
+    video.addEventListener('playing', () => {
+      log(`[VIDEO EVENT] ▶️ playing - video now playing (paused=${video.paused})`);
+    });
   }
 
-  function tryOverlayClick() {
-    const overlay = getVisibleClipsOverlay();
-    if (overlay) {
-      log('Clicking overlay to toggle play...');
-      overlay.click();
-    } else {
-      log('No overlay found for click');
+  // Setup logging for all videos
+  function setupAllVideoLogging() {
+    document.querySelectorAll('video').forEach(setupVideoEventLogging);
+  }
+
+  // Get current video state for logging
+  function getVideoState() {
+    const video = findVisibleVideo();
+    if (!video) return 'no-video';
+    return video.paused ? 'PAUSED' : 'PLAYING';
+  }
+
+  // Log touch event details
+  function logTouchEvent(eventType, e, extra = '') {
+    const touch = e.touches?.[0] || e.changedTouches?.[0];
+    const x = touch?.clientX?.toFixed(0) || '?';
+    const y = touch?.clientY?.toFixed(0) || '?';
+    const target = e.target?.tagName || '?';
+    const targetId = e.target?.id?.slice(0, 20) || '';
+    const isTrusted = e.isTrusted ? 'TRUSTED' : 'synthetic';
+    const videoState = getVideoState();
+
+    log(`[TOUCH] ${eventType} @ (${x},${y}) | target=<${target}>${targetId ? '#' + targetId : ''} | ${isTrusted} | video=${videoState}${extra ? ' | ' + extra : ''}`);
+  }
+
+  // ==================== END DEBUG LOGGING ====================
+
+  // Resume video after horizontal swipe (with logging)
+  function resumeVideoAfterSwipe() {
+    log('[RESUME] Starting resume sequence...');
+
+    // Try at multiple delays
+    const delays = [500, 1000, 1500, 2000];
+
+    delays.forEach(delay => {
+      setTimeout(() => {
+        const video = findVisibleVideo();
+        if (!video) {
+          log(`[RESUME @${delay}ms] No visible video`);
+          return;
+        }
+
+        log(`[RESUME @${delay}ms] video.paused=${video.paused}`);
+
+        if (video.paused) {
+          log(`[RESUME @${delay}ms] Calling video.play()...`);
+          video.play()
+            .then(() => log(`[RESUME @${delay}ms] play() promise resolved`))
+            .catch(err => log(`[RESUME @${delay}ms] play() error: ${err.message}`));
+        }
+      }, delay);
+    });
+  }
+
+  function findVisibleVideo() {
+    const videos = document.querySelectorAll('video');
+    for (const video of videos) {
+      if (isVisibleVideo(video)) {
+        return video;
+      }
     }
+    return null;
   }
 
   // Find the currently visible clips overlay (the main reel container)
@@ -790,18 +889,39 @@
       targetOverlay.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else if (direction === 'next') {
       // At end, try to load more by scrolling
-      log('At end, scrolling to load more');
+      log(`[LOAD MORE] At end (overlay ${currentIdx}/${overlays.length}), attempting to trigger Instagram lazy-load...`);
 
-      // Try multiple scroll methods
+      // Method 1: Window scroll
       window.scrollBy({ top: vh, behavior: 'smooth' });
+      log('[LOAD MORE] Method 1: window.scrollBy');
 
-      // Also try scrolling the main content area
+      // Method 2: Scroll the main content area
       const mainContent = document.querySelector('main') ||
                           document.querySelector('[role="main"]') ||
                           document.querySelector('section');
       if (mainContent) {
         mainContent.scrollBy({ top: vh, behavior: 'smooth' });
+        log('[LOAD MORE] Method 2: mainContent.scrollBy');
       }
+
+      // Method 3: Try scrolling the last overlay's parent
+      const lastOverlay = overlays[overlays.length - 1];
+      if (lastOverlay) {
+        const scrollParent = lastOverlay.closest('[style*="overflow"]') || lastOverlay.parentElement;
+        if (scrollParent && scrollParent !== document.body) {
+          scrollParent.scrollBy({ top: vh, behavior: 'smooth' });
+          log(`[LOAD MORE] Method 3: scrollParent (${scrollParent.tagName})`);
+        }
+      }
+
+      // Check if more loaded after delay
+      setTimeout(() => {
+        const newOverlays = document.querySelectorAll('[id^="clipsoverlay"]');
+        log(`[LOAD MORE] After 2s: ${newOverlays.length} overlays (was ${overlays.length})`);
+        if (newOverlays.length === overlays.length) {
+          log('[LOAD MORE] WARNING: No new overlays loaded - Instagram may be blocking');
+        }
+      }, 2000);
     } else {
       log('Already at first overlay');
     }
@@ -1329,6 +1449,13 @@
     if (panel) panel.classList.remove('visible');
   }
 
+  // Username display
+  function updateUsernameDisplay() {
+    const usernameEl = document.getElementById('instapump-username');
+    if (!usernameEl) return;
+    usernameEl.textContent = currentUsername ? `@${currentUsername}` : '';
+  }
+
   // List count display
   function updateListCount() {
     const countEl = document.getElementById('instapump-list-count');
@@ -1423,10 +1550,24 @@
     }
 
     // Version badge
-    const version = document.createElement('div');
-    version.id = 'instapump-version';
-    version.textContent = 'v2.1.32';
-    document.body.appendChild(version);
+    const versionBadge = document.createElement('div');
+    versionBadge.id = 'instapump-version';
+    versionBadge.textContent = `v${VERSION}`;
+    versionBadge.addEventListener('click', () => {
+      if (versionBadge.classList.contains('outdated')) {
+        window.open('https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump.user.js', '_blank');
+      }
+    });
+    document.body.appendChild(versionBadge);
+
+    // Check for updates after 3 seconds (let the page settle)
+    setTimeout(checkForUpdates, 3000);
+
+    // Username display
+    const usernameDisplay = document.createElement('div');
+    usernameDisplay.id = 'instapump-username';
+    usernameDisplay.textContent = '';
+    document.body.appendChild(usernameDisplay);
 
     // List count badge
     const listCount = document.createElement('div');
@@ -1650,15 +1791,31 @@
       }
     });
 
-    // Touch swipe support
+    // Touch swipe support with detailed logging
     document.addEventListener('touchstart', (e) => {
+      // Log ALL touchstart events for debugging
+      logTouchEvent('touchstart', e);
+
       if (e.target.closest('#instapump-fab, #instapump-logs, #instapump-list-panel')) return;
       swipeStartX = e.touches[0].clientX;
       swipeStartY = e.touches[0].clientY;
       swiping = true;
     }, { passive: true });
 
+    document.addEventListener('touchmove', (e) => {
+      if (!swiping) return;
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - swipeStartX;
+      const deltaY = touch.clientY - swipeStartY;
+      // Only log significant movement
+      if (Math.abs(deltaX) > 30 || Math.abs(deltaY) > 30) {
+        logTouchEvent('touchmove', e, `deltaX=${deltaX.toFixed(0)} deltaY=${deltaY.toFixed(0)}`);
+      }
+    }, { passive: true });
+
     document.addEventListener('touchend', (e) => {
+      logTouchEvent('touchend', e);
+
       if (!swiping) return;
       swiping = false;
       const touch = e.changedTouches[0];
@@ -1666,8 +1823,10 @@
       const deltaY = touch.clientY - swipeStartY;
       const isHorizontalSwipe = Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2;
 
+      log(`[SWIPE ANALYSIS] deltaX=${deltaX.toFixed(0)}, deltaY=${deltaY.toFixed(0)}, isHorizontal=${isHorizontalSwipe}`);
+
       if (isHorizontalSwipe) {
-        log(`Horizontal swipe detected: deltaX=${deltaX.toFixed(0)}`);
+        log(`[USER ACTION] Horizontal swipe ${deltaX > 0 ? 'RIGHT (approve)' : 'LEFT (reject)'}`);
 
         if (deltaX > 0) {
           showSwipeIndicator('approve');
@@ -1677,8 +1836,7 @@
           rejectAccount();
         }
 
-        // Instagram pauses on touchstart, resume after horizontal swipe
-        // Use setTimeout to let Instagram's handlers complete first
+        // Start resume attempts
         setTimeout(() => {
           resumeVideoAfterSwipe();
         }, 100);
@@ -1705,6 +1863,7 @@
       currentUsername = username;
       log(`Detected user: @${username} (mode: ${currentMode})`);
       updateStatusBorder();
+      updateUsernameDisplay();
       applyModeFilter(username);
     }
   }
@@ -1768,11 +1927,13 @@
     const observer = new MutationObserver(() => {
       hideElements();
       setupVideoAutoAdvance(); // Track new videos for auto-advance
+      setupAllVideoLogging(); // Track video events for debugging
     });
     observer.observe(document.body, { childList: true, subtree: true });
     setInterval(pollAndFilter, 500);
     setupVideoAutoAdvance(); // Initial setup
-    log('InstaPump v2.1.32 loaded - Added video resume after horizontal swipe');
+    setupAllVideoLogging(); // Initial video logging setup
+    log('InstaPump v2.1.38 loaded - DEBUG: touch events, video events, load more');
     console.log('✅ Init complete, FAB should be visible at bottom-right');
     console.log('📋 Saved selectors:', getSavedSelectors());
   }

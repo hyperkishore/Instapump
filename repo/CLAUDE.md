@@ -1,6 +1,10 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # InstaPump
 
-Safari userscript for clean Instagram Reels viewing with account filtering.
+Safari userscript for clean Instagram Reels viewing with account filtering. Also available as Chrome Extension and Electron app.
 
 **GitHub**: https://github.com/hyperkishore/Instapump
 
@@ -24,7 +28,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.32
+## Current Version: 2.1.37
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
@@ -74,6 +78,62 @@ window.instapump.toggleMode()
 window.instapump.getAllowlist()
 window.instapump.getBlocklist()
 window.instapump.clearLists()
+```
+
+---
+
+## Mode Behavior
+
+### Discovery Mode (D) - Blue button
+**Purpose:** Explore new content, filter out accounts you've rejected
+
+```
+When a reel appears:
+├── Is account in BLOCKLIST?
+│   ├── YES → Auto-skip to next reel, show "Skipping @username"
+│   └── NO → Play the reel (even if not in allowlist)
+```
+
+**Use case:** Finding new accounts to follow. You see everything EXCEPT accounts you've explicitly rejected.
+
+### Whitelist Mode (W) - Green button
+**Purpose:** Only watch content from approved accounts
+
+```
+When a reel appears:
+├── Is account in ALLOWLIST?
+│   ├── YES → Play the reel
+│   └── NO → Auto-skip to next reel, show "Not whitelisted: @username"
+```
+
+**Use case:** Curated viewing. Only see content from accounts you've approved.
+
+### User Actions
+
+| Action | Effect on Allowlist | Effect on Blocklist |
+|--------|---------------------|---------------------|
+| Swipe RIGHT (approve) | ADD to allowlist | REMOVE from blocklist |
+| Swipe LEFT (reject) | REMOVE from allowlist | ADD to blocklist |
+
+### Mode Filter Flow
+
+```
+User scrolls to new reel
+        ↓
+detectUsername() finds @username
+        ↓
+applyModeFilter(@username)
+        ↓
+    ┌─────────────────────────────────────┐
+    │  Mode = Discovery?                  │
+    │  ├── YES: Is @user in blocklist?    │
+    │  │        ├── YES → SKIP            │
+    │  │        └── NO → PLAY             │
+    │  └── NO (Whitelist mode):           │
+    │           Is @user in allowlist?    │
+    │           ├── YES → PLAY            │
+    │           └── NO → SKIP             │
+    └─────────────────────────────────────┘
 ```
 
 ---
@@ -459,3 +519,61 @@ Shows:
 - Connect iPhone to Mac
 - Safari > Develop > [iPhone name] > instagram.com
 - Console shows `[InstaPump]` prefixed logs
+
+---
+
+## Full Project Structure
+
+```
+InstaPump/
+├── repo/
+│   ├── CLAUDE.md                       # This file
+│   ├── README.md                       # Project overview
+│   ├── userscript/
+│   │   └── instapump.user.js           # PRIMARY - Safari userscript
+│   ├── extension/                      # Chrome Extension
+│   │   ├── manifest.json
+│   │   ├── content.js                  # Main content script
+│   │   ├── background.js
+│   │   ├── popup.js / popup.html       # Extension popup UI
+│   │   └── styles.css
+│   ├── electron-app/                   # Standalone Electron app
+│   │   ├── main.js                     # Electron main process
+│   │   ├── preload.js
+│   │   ├── package.json
+│   │   └── renderer/                   # UI components
+│   └── docs/                           # Architecture documentation
+├── instapump-app/                      # Legacy Electron dev folder
+└── instapump-extension/                # Legacy extension folder
+```
+
+---
+
+## Development Commands
+
+### Userscript Development
+1. Edit `repo/userscript/instapump.user.js`
+2. Bump version in userscript header AND console.log statement
+3. Sync to iCloud (see sync command at top of this file)
+4. Refresh Instagram on iPhone
+
+### Chrome Extension Development
+```bash
+# Load extension in Chrome:
+# 1. Go to chrome://extensions/
+# 2. Enable "Developer mode"
+# 3. Click "Load unpacked"
+# 4. Select repo/extension/ folder
+
+# After code changes:
+# 1. Click refresh icon on extension in chrome://extensions/
+# 2. Reload Instagram tab
+```
+
+### Electron App Development
+```bash
+cd repo/electron-app
+npm install
+npm start        # Standard run
+npm run dev      # With logging enabled
+```
