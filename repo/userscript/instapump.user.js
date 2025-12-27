@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.41
+// @version      2.1.42
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.41';
+  const VERSION = '2.1.42';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -122,7 +122,7 @@
     #instapump-status.approved { border-color: #34c759; }
     #instapump-status.rejected { border-color: #ff3b30; }
 
-    /* FAB Container */
+    /* FAB Container - Minimal, fades in on interaction */
     #instapump-fab {
       position: fixed;
       bottom: 100px;
@@ -132,36 +132,42 @@
       align-items: flex-end;
       gap: 8px;
       z-index: 999999;
+      opacity: 0.35;
+      transition: opacity 0.3s ease;
+    }
+    #instapump-fab:hover,
+    #instapump-fab.active {
+      opacity: 1;
     }
 
-    /* Main FAB - Instagram gradient style */
+    /* Main FAB - Minimal black/white like Instagram navbar */
     #instapump-fab-main {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.2);
       cursor: pointer;
-      font-size: 18px;
-      font-weight: 600;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1);
+      font-size: 15px;
+      font-weight: 500;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+      transition: transform 0.2s ease, border-color 0.2s ease;
       -webkit-tap-highlight-color: transparent;
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-      letter-spacing: -0.5px;
     }
     #instapump-fab-main:active {
       transform: scale(0.92);
-      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
     }
     #instapump-fab-main.discovery {
-      background: linear-gradient(135deg, #405DE6, #5851DB, #833AB4);
+      border-color: rgba(255,255,255,0.3);
     }
     #instapump-fab-main.whitelist {
-      background: linear-gradient(135deg, #C13584, #E1306C, #FD1D1D);
+      border-color: rgba(255,255,255,0.5);
     }
 
     /* FAB Menu */
@@ -173,7 +179,7 @@
       opacity: 0;
       transform: translateY(10px) scale(0.95);
       pointer-events: none;
-      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
     #instapump-fab-menu.open {
       opacity: 1;
@@ -182,40 +188,34 @@
     }
 
     .instapump-fab-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
       cursor: pointer;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
+      transition: transform 0.15s ease, background 0.15s ease;
       -webkit-tap-highlight-color: transparent;
-      background: rgba(38, 38, 40, 0.95);
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
     .instapump-fab-btn:active {
       transform: scale(0.9);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
     .instapump-fab-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       fill: none;
-      stroke: white;
-      stroke-width: 1.75;
+      stroke: rgba(255,255,255,0.9);
+      stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    #instapump-btn-lists { background: linear-gradient(135deg, #405DE6, #5851DB); }
-    #instapump-btn-picker { background: linear-gradient(135deg, #F77737, #FCAF45); }
-    #instapump-btn-logs { background: linear-gradient(135deg, #833AB4, #C13584); }
-    #instapump-btn-hide.enabled { background: linear-gradient(135deg, #C13584, #E1306C); }
-    #instapump-btn-hide.disabled { background: rgba(58, 58, 60, 0.95); }
-    #instapump-btn-inspect { background: linear-gradient(135deg, #5851DB, #833AB4); }
+    #instapump-btn-hide.enabled svg { stroke: white; }
+    #instapump-btn-hide.disabled svg { stroke: rgba(255,255,255,0.4); }
 
     /* Toast */
     #instapump-toast {

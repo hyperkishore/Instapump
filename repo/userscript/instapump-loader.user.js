@@ -25,20 +25,31 @@
 
   console.log(`🚀 InstaPump Loader v${LOADER_VERSION}`);
 
-  // Execute code safely
+  // Execute code in content script context (bypasses page CSP)
   function executeCode(code) {
     try {
       // Extract the IIFE from the userscript (skip metadata header)
       const codeStart = code.indexOf('(function()');
+      console.log('[InstaPump Loader] Code start index:', codeStart);
       if (codeStart === -1) {
-        console.error('[InstaPump Loader] Invalid script format');
+        console.error('[InstaPump Loader] Invalid script format - could not find (function()');
+        console.log('[InstaPump Loader] First 500 chars:', code.substring(0, 500));
         return false;
       }
       const executableCode = code.substring(codeStart);
-      new Function(executableCode)();
+      console.log('[InstaPump Loader] Executing code, length:', executableCode.length);
+
+      // Execute in content script context using Function constructor
+      // This works because content scripts have their own isolated world
+      // not subject to the page's CSP
+      const fn = new Function(executableCode);
+      fn();
+      console.log('[InstaPump Loader] Code executed via Function constructor');
+
       return true;
     } catch (e) {
       console.error('[InstaPump Loader] Execution error:', e);
+      console.error('[InstaPump Loader] Stack:', e.stack);
       return false;
     }
   }
@@ -82,10 +93,13 @@
 
   // Fetch latest from GitHub
   async function fetchLatest() {
+    console.log('[InstaPump Loader] Fetching from:', SCRIPT_URL);
     try {
       const response = await fetch(SCRIPT_URL, { cache: 'no-store' });
+      console.log('[InstaPump Loader] Fetch response status:', response.status);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const code = await response.text();
+      console.log('[InstaPump Loader] Fetched code length:', code.length);
 
       // Validate it looks like our script
       if (!code.includes('InstaPump') || !code.includes('@version')) {
@@ -93,7 +107,7 @@
       }
       return code;
     } catch (e) {
-      console.warn('[InstaPump Loader] Fetch failed:', e.message);
+      console.error('[InstaPump Loader] Fetch failed:', e.message);
       return null;
     }
   }
@@ -145,13 +159,16 @@
 
   // Main loader logic
   async function main() {
+    console.log('[InstaPump Loader] main() starting...');
     const cachedCode = getFromCache();
     const cachedVersion = getCachedVersion();
+    console.log('[InstaPump Loader] Cache status:', cachedCode ? `found v${cachedVersion}` : 'empty');
 
     // If we have cache, run it immediately
     if (cachedCode) {
       console.log(`[InstaPump Loader] Running cached v${cachedVersion}`);
-      executeCode(cachedCode);
+      const success = executeCode(cachedCode);
+      console.log('[InstaPump Loader] Cached code execution:', success ? 'SUCCESS' : 'FAILED');
 
       // Background update check (don't block)
       fetchLatest().then(latestCode => {
@@ -172,12 +189,14 @@
       });
     } else {
       // First time - must fetch
-      console.log('[InstaPump Loader] First run - fetching from GitHub...');
+      console.log('[InstaPump Loader] First run - no cache, fetching from GitHub...');
       const code = await fetchLatest();
+      console.log('[InstaPump Loader] Fetch result:', code ? `got ${code.length} bytes` : 'FAILED');
 
       if (code) {
         saveToCache(code);
-        executeCode(code);
+        const success = executeCode(code);
+        console.log('[InstaPump Loader] Fresh code execution:', success ? 'SUCCESS' : 'FAILED');
       } else {
         // Fetch failed, no cache - show error
         const showError = () => {
