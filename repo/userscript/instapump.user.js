@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.42
+// @version      2.1.43
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.42';
+  const VERSION = '2.1.43';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -661,41 +661,64 @@
 
   // ==================== END DEBUG LOGGING ====================
 
-  // Resume video after horizontal swipe (with logging)
+  // Resume video after horizontal swipe
+  // Instagram pauses on touchstart, we need to resume after detecting horizontal swipe
   function resumeVideoAfterSwipe() {
-    log('[RESUME] Starting resume sequence...');
+    // Strategy: Try multiple methods with logging to understand what works
 
-    // Try at multiple delays
-    const delays = [500, 1000, 1500, 2000];
-
-    delays.forEach(delay => {
-      setTimeout(() => {
-        const video = findVisibleVideo();
-        if (!video) {
-          log(`[RESUME @${delay}ms] No visible video`);
-          return;
-        }
-
-        log(`[RESUME @${delay}ms] video.paused=${video.paused}`);
-
-        if (video.paused) {
-          log(`[RESUME @${delay}ms] Calling video.play()...`);
-          video.play()
-            .then(() => log(`[RESUME @${delay}ms] play() promise resolved`))
-            .catch(err => log(`[RESUME @${delay}ms] play() error: ${err.message}`));
-        }
-      }, delay);
-    });
-  }
-
-  function findVisibleVideo() {
+    // Method 1: Find visible video and call play() directly
     const videos = document.querySelectorAll('video');
+    let visibleVideo = null;
+
     for (const video of videos) {
       if (isVisibleVideo(video)) {
-        return video;
+        visibleVideo = video;
+        break;
       }
     }
-    return null;
+
+    if (visibleVideo) {
+      log(`Resume attempt: video.paused=${visibleVideo.paused}, readyState=${visibleVideo.readyState}`);
+
+      if (visibleVideo.paused) {
+        // Try video.play() first
+        visibleVideo.play()
+          .then(() => {
+            log('Resume SUCCESS via video.play()');
+          })
+          .catch((err) => {
+            log(`Resume FAILED via video.play(): ${err.message}`);
+            // Method 2: Try clicking the overlay
+            tryOverlayClick();
+          });
+      } else {
+        log('Video already playing, no resume needed');
+      }
+    } else {
+      log('No visible video found, trying overlay click');
+      tryOverlayClick();
+    }
+
+    // Check state after delay
+    setTimeout(() => {
+      if (visibleVideo) {
+        log(`After 300ms: video.paused=${visibleVideo.paused}`);
+        if (visibleVideo.paused) {
+          log('Video still paused after resume attempt - trying overlay click');
+          tryOverlayClick();
+        }
+      }
+    }, 300);
+  }
+
+  function tryOverlayClick() {
+    const overlay = getVisibleClipsOverlay();
+    if (overlay) {
+      log('Clicking overlay to toggle play...');
+      overlay.click();
+    } else {
+      log('No overlay found for click');
+    }
   }
 
   // Find the currently visible clips overlay (the main reel container)
