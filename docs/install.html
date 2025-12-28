@@ -296,6 +296,7 @@
 
     .toolbar-arrow-overlay.visible {
       display: flex;
+      flex-direction: column;
     }
 
     .toolbar-arrow {
@@ -562,7 +563,7 @@
   </div>
 
   <!-- Step 3: Overlay with instructions before opening script -->
-  <div class="toolbar-arrow-overlay" id="toolbar-overlay" style="display: none; flex-direction: column;">
+  <div class="toolbar-arrow-overlay" id="toolbar-overlay">
     <div style="flex: 1; overflow-y: auto; padding: 40px 20px 20px;">
       <div class="toolbar-arrow-text" style="font-size: 20px; margin-bottom: 20px; text-align: center;">
         Here's what to do next:

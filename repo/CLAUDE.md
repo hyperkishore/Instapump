@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Code Review Requirement
+
+**IMPORTANT:** Before committing any code changes, perform at least 2 rounds of code review checking for:
+- Bugs and logic errors
+- CSS specificity issues (inline styles override classes)
+- Missing event handlers or incorrect element IDs
+- Syntax errors
+- Mobile responsiveness issues
+- Edge cases and error handling
+
 # InstaPump
 
 Safari userscript for clean Instagram Reels viewing with account filtering. Also available as Chrome Extension and Electron app.
