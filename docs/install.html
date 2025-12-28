@@ -561,36 +561,45 @@
     <button class="toolbar-dismiss" id="dismiss-step2">Got it</button>
   </div>
 
-  <!-- Step 3: Overlay telling user to switch tabs -->
+  <!-- Step 3: Overlay with instructions before opening script -->
   <div class="toolbar-arrow-overlay" id="toolbar-overlay">
-    <div class="step3-content" style="margin-top: 80px;">
-      <div class="toolbar-arrow-icon" style="margin: 0 auto 24px; width: 70px; height: 70px;">
-        <svg viewBox="0 0 24 24">
-          <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
-        </svg>
+    <div class="step3-content" style="margin-top: 60px;">
+      <div class="toolbar-arrow-text" style="font-size: 22px; margin-bottom: 24px;">
+        Here's what to do next:
       </div>
-      <div class="toolbar-arrow-text" style="font-size: 24px; margin-bottom: 16px;">
-        Script opened in new tab!
-      </div>
-      <div class="toolbar-arrow-subtext" style="font-size: 16px; line-height: 1.6;">
-        Switch to that tab, then:
-      </div>
-      <div class="step2-instructions" style="margin-top: 24px; text-align: left; max-width: 320px; margin-left: auto; margin-right: auto;">
+      <div class="step2-instructions" style="text-align: left; max-width: 340px; margin: 0 auto;">
         <div class="step2-instruction">
           <span class="step2-num">1</span>
-          <span>Tap <strong>aA</strong> → <strong>Manage Extensions</strong></span>
+          <span>Tap <strong>aA</strong> button (top-left corner)</span>
         </div>
         <div class="step2-instruction">
           <span class="step2-num">2</span>
-          <span>Toggle <strong>Userscripts</strong> ON</span>
+          <span>Tap <strong>Manage Extensions</strong></span>
         </div>
         <div class="step2-instruction">
           <span class="step2-num">3</span>
-          <span>Tap <strong>puzzle icon</strong> → <strong>Install</strong></span>
+          <span>Turn ON <strong>Userscripts</strong></span>
+        </div>
+        <div class="step2-instruction">
+          <span class="step2-num">4</span>
+          <span>Set to <strong>All Websites</strong> → tap <strong>Done</strong></span>
+        </div>
+        <div class="step2-instruction">
+          <span class="step2-num">5</span>
+          <span>Tap <strong>puzzle icon</strong> (bottom toolbar)</span>
+        </div>
+        <div class="step2-instruction">
+          <span class="step2-num">6</span>
+          <span>Tap <strong>Install</strong></span>
         </div>
       </div>
+      <div class="toolbar-arrow-subtext" style="margin-top: 24px; font-size: 14px;">
+        Ready? Tap below to open the script page.
+      </div>
     </div>
-    <button class="toolbar-dismiss" id="dismiss-overlay">Got it</button>
+    <button class="toolbar-dismiss" id="dismiss-overlay" style="background: var(--accent); color: white; border: none; padding: 14px 28px; font-size: 16px;">
+      Open Script Page →
+    </button>
   </div>
 
   <!-- Header -->
@@ -855,37 +864,35 @@
     const iosDownloadBtn = document.getElementById('ios-download-btn');
     const macDownloadBtn = document.getElementById('mac-download-btn');
 
+    // Store the script URL for later
+    const scriptUrl = 'https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump-loader.user.js';
+
+    // iOS: Show overlay first, open script on "Got it"
     if (iosDownloadBtn) {
       iosDownloadBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        // Open in background tab
-        const scriptUrl = this.href;
-        window.open(scriptUrl, '_blank');
-        // Try to keep focus on this page
-        window.focus();
-        // Show overlay after a short delay
-        setTimeout(() => {
-          step3Overlay.classList.add('visible');
-        }, 300);
+        step3Overlay.classList.add('visible');
       });
     }
 
+    // Mac: Show overlay first, open script on "Got it"
     if (macDownloadBtn) {
       macDownloadBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        const scriptUrl = this.href;
-        window.open(scriptUrl, '_blank');
-        window.focus();
+        step3Overlay.classList.add('visible');
       });
     }
 
+    // "Got it" button opens the script page
     if (dismissStep3Btn) {
       dismissStep3Btn.addEventListener('click', function() {
         step3Overlay.classList.remove('visible');
+        // Now open the script page
+        window.open(scriptUrl, '_blank');
       });
     }
 
-    // Dismiss Step 3 overlay on tap outside
+    // Dismiss on tap outside (without opening script)
     if (step3Overlay) {
       step3Overlay.addEventListener('click', function(e) {
         if (e.target === step3Overlay) {
