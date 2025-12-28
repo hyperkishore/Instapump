@@ -562,44 +562,43 @@
   </div>
 
   <!-- Step 3: Overlay with instructions before opening script -->
-  <div class="toolbar-arrow-overlay" id="toolbar-overlay">
-    <div class="step3-content" style="margin-top: 60px;">
-      <div class="toolbar-arrow-text" style="font-size: 22px; margin-bottom: 24px;">
+  <div class="toolbar-arrow-overlay" id="toolbar-overlay" style="display: none; flex-direction: column;">
+    <div style="flex: 1; overflow-y: auto; padding: 40px 20px 20px;">
+      <div class="toolbar-arrow-text" style="font-size: 20px; margin-bottom: 20px; text-align: center;">
         Here's what to do next:
       </div>
-      <div class="step2-instructions" style="text-align: left; max-width: 340px; margin: 0 auto;">
-        <div class="step2-instruction">
-          <span class="step2-num">1</span>
-          <span>Tap <strong>aA</strong> button (top-left corner)</span>
+      <div class="step2-instructions" style="text-align: left; max-width: 320px; margin: 0 auto;">
+        <div class="step2-instruction" style="padding: 10px 0;">
+          <span class="step2-num" style="width: 28px; height: 28px; font-size: 13px;">1</span>
+          <span>Tap <strong>aA</strong> (top-left)</span>
         </div>
-        <div class="step2-instruction">
-          <span class="step2-num">2</span>
+        <div class="step2-instruction" style="padding: 10px 0;">
+          <span class="step2-num" style="width: 28px; height: 28px; font-size: 13px;">2</span>
           <span>Tap <strong>Manage Extensions</strong></span>
         </div>
-        <div class="step2-instruction">
-          <span class="step2-num">3</span>
+        <div class="step2-instruction" style="padding: 10px 0;">
+          <span class="step2-num" style="width: 28px; height: 28px; font-size: 13px;">3</span>
           <span>Turn ON <strong>Userscripts</strong></span>
         </div>
-        <div class="step2-instruction">
-          <span class="step2-num">4</span>
-          <span>Set to <strong>All Websites</strong> → tap <strong>Done</strong></span>
+        <div class="step2-instruction" style="padding: 10px 0;">
+          <span class="step2-num" style="width: 28px; height: 28px; font-size: 13px;">4</span>
+          <span><strong>All Websites</strong> → <strong>Done</strong></span>
         </div>
-        <div class="step2-instruction">
-          <span class="step2-num">5</span>
-          <span>Tap <strong>puzzle icon</strong> (bottom toolbar)</span>
+        <div class="step2-instruction" style="padding: 10px 0;">
+          <span class="step2-num" style="width: 28px; height: 28px; font-size: 13px;">5</span>
+          <span>Tap <strong>puzzle icon</strong> (bottom)</span>
         </div>
-        <div class="step2-instruction">
-          <span class="step2-num">6</span>
+        <div class="step2-instruction" style="padding: 10px 0; border-bottom: none;">
+          <span class="step2-num" style="width: 28px; height: 28px; font-size: 13px;">6</span>
           <span>Tap <strong>Install</strong></span>
         </div>
       </div>
-      <div class="toolbar-arrow-subtext" style="margin-top: 24px; font-size: 14px;">
-        Ready? Tap below to open the script page.
-      </div>
     </div>
-    <button class="toolbar-dismiss" id="dismiss-overlay" style="background: var(--accent); color: white; border: none; padding: 14px 28px; font-size: 16px;">
-      Open Script Page →
-    </button>
+    <div style="padding: 20px; background: rgba(0,0,0,0.9); border-top: 1px solid var(--border);">
+      <button class="toolbar-dismiss" id="dismiss-overlay" style="background: var(--accent); color: white; border: none; padding: 16px 32px; font-size: 16px; width: 100%; border-radius: 12px;">
+        Open Script Page →
+      </button>
+    </div>
   </div>
 
   <!-- Header -->
