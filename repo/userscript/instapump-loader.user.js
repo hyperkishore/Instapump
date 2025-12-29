@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump Loader
 // @namespace    https://instapump.app
-// @version      1.0.0
+// @version      1.1.0
 // @description  Auto-updating loader for InstaPump
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,8 @@
   const SCRIPT_URL = 'https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js';
   const CACHE_KEY = 'instapump_cached_code';
   const VERSION_KEY = 'instapump_cached_version';
-  const LOADER_VERSION = '1.0.0';
+  const LOADER_VERSION = '1.1.0';
+  const FETCH_TIMEOUT_MS = 3000; // Max wait for fresh code before falling back to cache
 
   // Prevent double execution
   if (window.__instapump_loaded) return;
@@ -157,57 +158,57 @@
     return false;
   }
 
-  // Main loader logic
+  // Fetch with timeout
+  async function fetchWithTimeout(timeoutMs) {
+    return Promise.race([
+      fetchLatest(),
+      new Promise(resolve => setTimeout(() => resolve(null), timeoutMs))
+    ]);
+  }
+
+  // Main loader logic - Always fetch latest first
   async function main() {
     console.log('[InstaPump Loader] main() starting...');
     const cachedCode = getFromCache();
     const cachedVersion = getCachedVersion();
     console.log('[InstaPump Loader] Cache status:', cachedCode ? `found v${cachedVersion}` : 'empty');
 
-    // If we have cache, run it immediately
-    if (cachedCode) {
-      console.log(`[InstaPump Loader] Running cached v${cachedVersion}`);
+    // Always try to fetch latest first (with timeout)
+    console.log(`[InstaPump Loader] Fetching latest (${FETCH_TIMEOUT_MS}ms timeout)...`);
+    const latestCode = await fetchWithTimeout(FETCH_TIMEOUT_MS);
+
+    if (latestCode) {
+      // Got fresh code - use it
+      const latestVersion = parseVersion(latestCode);
+      console.log(`[InstaPump Loader] Got fresh v${latestVersion}`);
+
+      saveToCache(latestCode);
+      const success = executeCode(latestCode);
+      console.log('[InstaPump Loader] Fresh code execution:', success ? 'SUCCESS' : 'FAILED');
+
+      // Show update notification if version changed
+      if (cachedVersion && isNewer(latestVersion, cachedVersion)) {
+        const notify = () => showToast(`Updated to v${latestVersion}`);
+        if (document.body) notify();
+        else document.addEventListener('DOMContentLoaded', notify);
+      }
+    } else if (cachedCode) {
+      // Fetch failed/timed out - fall back to cache
+      console.log(`[InstaPump Loader] Fetch failed, using cached v${cachedVersion}`);
       const success = executeCode(cachedCode);
       console.log('[InstaPump Loader] Cached code execution:', success ? 'SUCCESS' : 'FAILED');
 
-      // Background update check (don't block)
-      fetchLatest().then(latestCode => {
-        if (latestCode) {
-          const latestVersion = parseVersion(latestCode);
-          if (isNewer(latestVersion, cachedVersion)) {
-            saveToCache(latestCode);
-            // Wait for DOM to be ready for toast
-            if (document.body) {
-              showToast(`Update v${latestVersion} ready - refresh to apply`);
-            } else {
-              document.addEventListener('DOMContentLoaded', () => {
-                showToast(`Update v${latestVersion} ready - refresh to apply`);
-              });
-            }
-          }
-        }
-      });
+      const notify = () => showToast('Offline - using cached version');
+      if (document.body) notify();
+      else document.addEventListener('DOMContentLoaded', notify);
     } else {
-      // First time - must fetch
-      console.log('[InstaPump Loader] First run - no cache, fetching from GitHub...');
-      const code = await fetchLatest();
-      console.log('[InstaPump Loader] Fetch result:', code ? `got ${code.length} bytes` : 'FAILED');
-
-      if (code) {
-        saveToCache(code);
-        const success = executeCode(code);
-        console.log('[InstaPump Loader] Fresh code execution:', success ? 'SUCCESS' : 'FAILED');
-      } else {
-        // Fetch failed, no cache - show error
-        const showError = () => {
-          showToast('InstaPump: Connect to internet for first setup', true);
-        };
-        if (document.body) {
-          showError();
-        } else {
-          document.addEventListener('DOMContentLoaded', showError);
-        }
-      }
+      // No fetch, no cache - first time setup failed
+      console.error('[InstaPump Loader] No code available');
+      const showError = () => {
+        showToast('InstaPump: Connect to internet for first setup', true);
+      };
+      if (document.body) showError();
+      else document.addEventListener('DOMContentLoaded', showError);
     }
   }
 
