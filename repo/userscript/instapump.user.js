@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.50
+// @version      2.1.51
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.50';
+  const VERSION = '2.1.51';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -266,17 +266,31 @@
 
     /* ==================== InstaPump UI ==================== */
 
-    /* Status border */
+    /* Status border - Animated pulse glow */
     #instapump-status {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       pointer-events: none;
       z-index: 999998;
-      border: 4px solid transparent;
-      transition: border-color 0.3s;
+      box-shadow: inset 0 0 0 rgba(0,0,0,0);
+      transition: box-shadow 0.3s ease-out;
     }
-    #instapump-status.approved { border-color: #34c759; }
-    #instapump-status.rejected { border-color: #ff3b30; }
+    #instapump-status.approved {
+      box-shadow: inset 0 0 20px rgba(52, 199, 89, 0.4);
+      animation: pulseGreen 2s ease-in-out infinite;
+    }
+    #instapump-status.rejected {
+      box-shadow: inset 0 0 20px rgba(255, 59, 48, 0.4);
+      animation: pulseRed 2s ease-in-out infinite;
+    }
+    @keyframes pulseGreen {
+      0%, 100% { box-shadow: inset 0 0 15px rgba(52, 199, 89, 0.3); }
+      50% { box-shadow: inset 0 0 30px rgba(52, 199, 89, 0.5); }
+    }
+    @keyframes pulseRed {
+      0%, 100% { box-shadow: inset 0 0 15px rgba(255, 59, 48, 0.3); }
+      50% { box-shadow: inset 0 0 30px rgba(255, 59, 48, 0.5); }
+    }
 
     /* FAB Container - Minimal, fades in on interaction */
     #instapump-fab {
