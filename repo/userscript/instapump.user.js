@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.54
+// @version      2.1.55
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.54';
+  const VERSION = '2.1.55';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -2004,7 +2004,7 @@
         <button class="instapump-fab-btn" id="instapump-btn-lists" title="View Lists">${ICONS.lists}</button>
         <button class="instapump-fab-btn instapump-debug-item" id="instapump-btn-logs" title="Debug Logs">${ICONS.bug}</button>
         <button class="instapump-fab-btn instapump-debug-item" id="instapump-btn-picker" title="Element Picker">${ICONS.picker}</button>
-        <button class="instapump-fab-btn instapump-debug-item ${hidingEnabled ? 'enabled' : 'disabled'}" id="instapump-btn-hide" title="Toggle Hiding">${hidingEnabled ? ICONS.eyeOn : ICONS.eyeOff}</button>
+        <button class="instapump-fab-btn ${hidingEnabled ? 'enabled' : 'disabled'}" id="instapump-btn-hide" title="Toggle Hiding">${hidingEnabled ? ICONS.eyeOn : ICONS.eyeOff}</button>
         <button class="instapump-fab-btn instapump-debug-item" id="instapump-btn-inspect" title="Tap Inspector">${ICONS.inspect}</button>
       </div>
     `;
