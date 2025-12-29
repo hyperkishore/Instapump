@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.46
+// @version      2.1.47
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,22 +16,74 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.46';
+  const VERSION = '2.1.47';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
 
+  // Helper function to check if current page is a reels page
+  function isOnReelsPage() {
+    const path = window.location.pathname;
+    return path.startsWith('/reels') || path.startsWith('/reel/');
+  }
+
   // Only run on reels pages - completely exit otherwise
-  // Match /reels (feed) and /reel/ID (individual reel)
-  const path = window.location.pathname;
-  const isReelsPage = path.startsWith('/reels') || path.startsWith('/reel/');
-  if (!isReelsPage) {
+  if (!isOnReelsPage()) {
     // Silent exit - don't initialize anything on non-reels pages
     return;
   }
 
   // Confirm script is loading (only shows on reels pages now)
   console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${LOADED_VIA_LOADER ? ' (via loader)' : ''}`);
+
+  // Track UI visibility state
+  let instapumpUIVisible = true;
+
+  // Hide/show all InstaPump UI elements based on current page
+  function toggleInstaPumpUI(visible) {
+    if (instapumpUIVisible === visible) return; // No change needed
+    instapumpUIVisible = visible;
+
+    // Select all InstaPump elements except the CSS <style> element
+    const uiElements = document.querySelectorAll('[id^="instapump-"]:not(style)');
+    uiElements.forEach(el => {
+      el.style.display = visible ? '' : 'none';
+    });
+
+    if (!visible) {
+      console.log('[InstaPump] UI hidden - not on reels page');
+    } else {
+      console.log('[InstaPump] UI shown - back on reels page');
+    }
+  }
+
+  // Watch for SPA navigation (Instagram uses history API)
+  function setupNavigationWatcher() {
+    // Intercept pushState
+    const originalPushState = history.pushState;
+    history.pushState = function(...args) {
+      originalPushState.apply(this, args);
+      handleNavigationChange();
+    };
+
+    // Intercept replaceState
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function(...args) {
+      originalReplaceState.apply(this, args);
+      handleNavigationChange();
+    };
+
+    // Listen for back/forward navigation
+    window.addEventListener('popstate', handleNavigationChange);
+  }
+
+  function handleNavigationChange() {
+    const onReels = isOnReelsPage();
+    toggleInstaPumpUI(onReels);
+  }
+
+  // Set up navigation watcher immediately
+  setupNavigationWatcher();
 
   // Clear dangerous selectors on startup
   const FORBIDDEN_SELECTORS = ['div', 'main', 'body', 'html', 'article', 'section', 'span', 'a', 'button', 'div.html-div', 'video', 'img', 'svg', 'canvas'];
