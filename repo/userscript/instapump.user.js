@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.44
+// @version      2.1.45
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.44';
+  const VERSION = '2.1.45';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -47,12 +47,12 @@
   } catch {}
 
 
-  // Only run on reels pages
-  if (!window.location.href.includes('/reels')) {
-    if (window.location.pathname === '/' || window.location.pathname === '') {
-      window.location.href = 'https://www.instagram.com/reels/';
-      return;
-    }
+  // Only run on reels pages - completely exit otherwise
+  // Match both /reels/ (feed) and /reel/ (individual reel)
+  const isReelsPage = window.location.href.includes('/reels') || window.location.href.includes('/reel/');
+  if (!isReelsPage) {
+    console.log('[InstaPump] Not on reels page - extension disabled');
+    return; // Exit completely, don't initialize anything
   }
 
   // Storage keys
