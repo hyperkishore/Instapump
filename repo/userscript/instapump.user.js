@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.49
+// @version      2.1.50
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.49';
+  const VERSION = '2.1.50';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -224,14 +224,22 @@
 
   // SVG Icons (flat, minimal style - Instagram inspired)
   const ICONS = {
+    // Mode icons for main FAB button
+    compass: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z" fill="currentColor"/></svg>',
+    bullseye: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+    // Menu icons
     lists: '<svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>',
+    stats: '<svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>',
+    // Debug icons (hidden until debug mode)
     picker: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',
-    logs: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>',
+    bug: '<svg viewBox="0 0 24 24"><path d="M8 2l1.88 1.88M14.12 3.88L16 2M9 7.13v-1a3 3 0 116 0v1"/><path d="M5 10h14M5 14h14M12 10v10"/><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M6 18l-2 2M18 18l2 2M6 12l-2-1M18 12l2-1"/></svg>',
     eyeOn: '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
     eyeOff: '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
-    inspect: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
-    stats: '<svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>'
+    inspect: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>'
   };
+
+  // Debug mode state
+  let debugModeEnabled = false;
 
   // CSS - Carefully adding back UI hiding
   const HIDE_CSS = `
@@ -295,8 +303,6 @@
       border-radius: 50%;
       border: 1.5px solid rgba(255,255,255,0.2);
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 500;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -306,7 +312,15 @@
       color: white;
       transition: transform 0.2s ease, border-color 0.2s ease;
       -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+    #instapump-fab-main svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: rgba(255,255,255,0.9);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     #instapump-fab-main:active {
       transform: scale(0.92);
@@ -364,6 +378,14 @@
     }
     #instapump-btn-hide.enabled svg { stroke: white; }
     #instapump-btn-hide.disabled svg { stroke: rgba(255,255,255,0.4); }
+
+    /* Debug-only items - hidden by default */
+    .instapump-debug-item {
+      display: none !important;
+    }
+    .instapump-debug-mode .instapump-debug-item {
+      display: flex !important;
+    }
 
     /* Toast */
     #instapump-toast {
@@ -819,7 +841,7 @@
     if (!fab) return;
     fab.classList.remove('discovery', 'whitelist');
     fab.classList.add(currentMode);
-    fab.textContent = currentMode === 'discovery' ? 'D' : 'W';
+    fab.innerHTML = currentMode === 'discovery' ? ICONS.compass : ICONS.bullseye;
   }
 
   // FAB menu
@@ -1948,14 +1970,14 @@
     const fab = document.createElement('div');
     fab.id = 'instapump-fab';
     fab.innerHTML = `
-      <button id="instapump-fab-main" class="${currentMode}">${currentMode === 'discovery' ? 'D' : 'W'}</button>
+      <button id="instapump-fab-main" class="${currentMode}">${currentMode === 'discovery' ? ICONS.compass : ICONS.bullseye}</button>
       <div id="instapump-fab-menu">
         <button class="instapump-fab-btn" id="instapump-btn-stats" title="Stats">${ICONS.stats}</button>
         <button class="instapump-fab-btn" id="instapump-btn-lists" title="View Lists">${ICONS.lists}</button>
-        <button class="instapump-fab-btn" id="instapump-btn-picker" title="Element Picker">${ICONS.picker}</button>
-        <button class="instapump-fab-btn" id="instapump-btn-logs" title="Logs">${ICONS.logs}</button>
-        <button class="instapump-fab-btn ${hidingEnabled ? 'enabled' : 'disabled'}" id="instapump-btn-hide" title="Toggle Hiding">${hidingEnabled ? ICONS.eyeOn : ICONS.eyeOff}</button>
-        <button class="instapump-fab-btn" id="instapump-btn-inspect" title="Tap Inspector">${ICONS.inspect}</button>
+        <button class="instapump-fab-btn instapump-debug-item" id="instapump-btn-logs" title="Debug Logs">${ICONS.bug}</button>
+        <button class="instapump-fab-btn instapump-debug-item" id="instapump-btn-picker" title="Element Picker">${ICONS.picker}</button>
+        <button class="instapump-fab-btn instapump-debug-item ${hidingEnabled ? 'enabled' : 'disabled'}" id="instapump-btn-hide" title="Toggle Hiding">${hidingEnabled ? ICONS.eyeOn : ICONS.eyeOff}</button>
+        <button class="instapump-fab-btn instapump-debug-item" id="instapump-btn-inspect" title="Tap Inspector">${ICONS.inspect}</button>
       </div>
     `;
     document.body.appendChild(fab);
@@ -2057,6 +2079,40 @@
     let fabPressTimer = null;
     let fabLongPressed = false;
 
+    // 5-tap debug mode detection
+    let tapCount = 0;
+    let tapResetTimer = null;
+    const TAP_WINDOW_MS = 2000; // Time window for 5 taps
+    const TAP_COUNT_FOR_DEBUG = 5;
+
+    function handleTap() {
+      tapCount++;
+      clearTimeout(tapResetTimer);
+
+      if (tapCount >= TAP_COUNT_FOR_DEBUG) {
+        // Enable debug mode
+        tapCount = 0;
+        toggleDebugMode();
+      } else {
+        // Reset tap count after window expires
+        tapResetTimer = setTimeout(() => {
+          tapCount = 0;
+        }, TAP_WINDOW_MS);
+        // Normal tap action - toggle mode
+        toggleMode();
+      }
+    }
+
+    function toggleDebugMode() {
+      debugModeEnabled = !debugModeEnabled;
+      const fabMenu = document.getElementById('instapump-fab-menu');
+      if (fabMenu) {
+        fabMenu.classList.toggle('instapump-debug-mode', debugModeEnabled);
+      }
+      showToast(debugModeEnabled ? '🐛 Debug Mode ON' : 'Debug Mode OFF');
+      log(`[DEBUG MODE] ${debugModeEnabled ? 'Enabled' : 'Disabled'}`);
+    }
+
     fabMain.addEventListener('pointerdown', () => {
       fabLongPressed = false;
       fabPressTimer = setTimeout(() => {
@@ -2067,7 +2123,7 @@
 
     fabMain.addEventListener('pointerup', () => {
       clearTimeout(fabPressTimer);
-      if (!fabLongPressed) toggleMode();
+      if (!fabLongPressed) handleTap();
     });
 
     fabMain.addEventListener('pointerleave', () => clearTimeout(fabPressTimer));
