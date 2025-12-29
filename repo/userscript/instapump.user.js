@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.45
+// @version      2.1.46
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,12 +16,21 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.45';
+  const VERSION = '2.1.46';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
 
-  // TEST: Confirm script is loading
+  // Only run on reels pages - completely exit otherwise
+  // Match /reels (feed) and /reel/ID (individual reel)
+  const path = window.location.pathname;
+  const isReelsPage = path.startsWith('/reels') || path.startsWith('/reel/');
+  if (!isReelsPage) {
+    // Silent exit - don't initialize anything on non-reels pages
+    return;
+  }
+
+  // Confirm script is loading (only shows on reels pages now)
   console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${LOADED_VIA_LOADER ? ' (via loader)' : ''}`);
 
   // Clear dangerous selectors on startup
@@ -45,15 +54,6 @@
       localStorage.setItem('instapump_selectors', JSON.stringify(selectors));
     }
   } catch {}
-
-
-  // Only run on reels pages - completely exit otherwise
-  // Match both /reels/ (feed) and /reel/ (individual reel)
-  const isReelsPage = window.location.href.includes('/reels') || window.location.href.includes('/reel/');
-  if (!isReelsPage) {
-    console.log('[InstaPump] Not on reels page - extension disabled');
-    return; // Exit completely, don't initialize anything
-  }
 
   // Storage keys
   const STORAGE_KEY_ALLOWLIST = 'instapump_allowlist';
