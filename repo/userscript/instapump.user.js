@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.52
+// @version      2.1.53
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.52';
+  const VERSION = '2.1.53';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -240,6 +240,7 @@
 
   // Debug mode state
   let debugModeEnabled = false;
+  let touchLoggingEnabled = false; // Separate opt-in for touch event logging
 
   // CSS - Carefully adding back UI hiding
   const HIDE_CSS = `
@@ -913,9 +914,9 @@
     return video.paused ? 'PAUSED' : 'PLAYING';
   }
 
-  // Log touch event details (only in debug mode)
+  // Log touch event details (only when explicitly enabled)
   function logTouchEvent(eventType, e, extra = '') {
-    if (!debugModeEnabled) return; // Skip touch logging unless debug mode is on
+    if (!touchLoggingEnabled) return; // Skip unless touch logging explicitly enabled
 
     const touch = e.touches?.[0] || e.changedTouches?.[0];
     const x = touch?.clientX?.toFixed(0) || '?';
@@ -2027,8 +2028,9 @@
       <div class="log-header">
         <span>Debug Logs (<span id="instapump-pick-count">0</span> picked)</span>
         <div>
-          <button id="instapump-btn-export">Export JSON</button>
-          <button id="instapump-btn-copy">Copy Logs</button>
+          <button id="instapump-btn-touch" style="opacity: 0.5">Touch</button>
+          <button id="instapump-btn-export">Export</button>
+          <button id="instapump-btn-copy">Copy</button>
           <button id="instapump-btn-clear">Clear</button>
           <button id="instapump-btn-close">✕</button>
         </div>
@@ -2258,6 +2260,13 @@
     });
 
     document.getElementById('instapump-btn-close').addEventListener('click', hideLogsPanel);
+
+    document.getElementById('instapump-btn-touch').addEventListener('click', () => {
+      touchLoggingEnabled = !touchLoggingEnabled;
+      const btn = document.getElementById('instapump-btn-touch');
+      btn.style.opacity = touchLoggingEnabled ? '1' : '0.5';
+      showToast(touchLoggingEnabled ? 'Touch logging ON' : 'Touch logging OFF');
+    });
 
     // Swipe gestures
     let swipeStartX = 0, swipeStartY = 0, swiping = false;
