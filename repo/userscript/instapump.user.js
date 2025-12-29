@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.48
+// @version      2.1.49
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.48';
+  const VERSION = '2.1.49';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -139,6 +139,85 @@
   let tapInspectorActive = false; // Tap inspector mode
   const logs = [];
 
+  // ==================== SESSION STATS TRACKING ====================
+  const sessionStats = {
+    startTime: Date.now(),
+    reelsSkipped: 0,
+    reelsViewed: 0,
+    lastReminderTime: Date.now(),
+    reminderIntervalMs: 30 * 60 * 1000 // 30 minutes
+  };
+
+  // Get today's date key for daily stats
+  function getTodayKey() {
+    return new Date().toISOString().split('T')[0]; // "2025-12-29"
+  }
+
+  // Get daily stats from localStorage
+  function getDailyStats() {
+    try {
+      return JSON.parse(localStorage.getItem('instapump_daily_stats')) || {};
+    } catch { return {}; }
+  }
+
+  // Save daily stats to localStorage
+  function saveDailyStats(stats) {
+    localStorage.setItem('instapump_daily_stats', JSON.stringify(stats));
+  }
+
+  // Increment a daily stat
+  function incrementDailyStat(statName, amount = 1) {
+    const stats = getDailyStats();
+    const today = getTodayKey();
+    if (!stats[today]) {
+      stats[today] = { reelsSkipped: 0, reelsViewed: 0, timeSpentMs: 0 };
+    }
+    stats[today][statName] = (stats[today][statName] || 0) + amount;
+    saveDailyStats(stats);
+    return stats[today];
+  }
+
+  // Get formatted session duration
+  function getSessionDuration() {
+    const ms = Date.now() - sessionStats.startTime;
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    if (minutes === 0) return `${seconds}s`;
+    return `${minutes}m ${seconds}s`;
+  }
+
+  // Estimate time saved (average reel = 20 seconds)
+  function getTimeSaved() {
+    const secondsSaved = sessionStats.reelsSkipped * 20;
+    const minutes = Math.floor(secondsSaved / 60);
+    const seconds = secondsSaved % 60;
+    if (minutes === 0) return `${seconds}s`;
+    return `${minutes}m ${seconds}s`;
+  }
+
+  // Check if it's time for a gentle reminder
+  function checkTimeReminder() {
+    const now = Date.now();
+    const sessionDurationMs = now - sessionStats.startTime;
+    const timeSinceLastReminder = now - sessionStats.lastReminderTime;
+
+    // Show reminder every 30 minutes
+    if (timeSinceLastReminder >= sessionStats.reminderIntervalMs) {
+      sessionStats.lastReminderTime = now;
+      const minutes = Math.floor(sessionDurationMs / 60000);
+      showTimeReminder(minutes);
+    }
+  }
+
+  // Show a gentle time reminder
+  function showTimeReminder(minutes) {
+    const skipped = sessionStats.reelsSkipped;
+    const timeSaved = getTimeSaved();
+    const message = `⏰ ${minutes}min scrolling • Skipped ${skipped} reels • Saved ~${timeSaved}`;
+    showToast(message);
+    log(`[TIME REMINDER] ${message}`);
+  }
+
   // Session-only storage (resets on refresh)
   const sessionHiddenElements = []; // Array of {element, data} objects
   const sessionElementData = []; // JSON data for export
@@ -150,7 +229,8 @@
     logs: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>',
     eyeOn: '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
     eyeOff: '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
-    inspect: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>'
+    inspect: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
+    stats: '<svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>'
   };
 
   // CSS - Carefully adding back UI hiding
@@ -474,6 +554,83 @@
       text-align: center;
       padding: 40px 20px;
       font-size: 13px;
+    }
+
+    /* Stats panel */
+    #instapump-stats-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background: rgba(0,0,0,0.95);
+      border-radius: 16px;
+      z-index: 1000001;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    #instapump-stats-panel.visible { display: flex; }
+    #instapump-stats-panel .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #instapump-stats-panel .panel-header h3 {
+      margin: 0;
+      color: white;
+      font-size: 16px;
+    }
+    #instapump-stats-panel .panel-close {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    #instapump-stats-panel .stats-content {
+      padding: 16px;
+    }
+    #instapump-stats-panel .stats-section {
+      margin-bottom: 20px;
+    }
+    #instapump-stats-panel .stats-section-title {
+      color: #888;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    #instapump-stats-panel .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    #instapump-stats-panel .stat-row:last-child {
+      border-bottom: none;
+    }
+    #instapump-stats-panel .stat-label {
+      color: #aaa;
+      font-size: 14px;
+    }
+    #instapump-stats-panel .stat-value {
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    #instapump-stats-panel .stat-value.highlight {
+      color: #34c759;
+    }
+    #instapump-stats-panel .stat-value.warning {
+      color: #ff9500;
     }
 
     /* Logs panel */
@@ -1075,11 +1232,13 @@
 
     log(`applyModeFilter: @${username}, mode=${currentMode}, inAllowlist=${allowlist.includes(username)}, inBlocklist=${blocklist.includes(username)}`);
 
+    let shouldSkip = false;
+
     if (currentMode === 'discovery') {
       if (blocklist.includes(username)) {
         log(`Discovery mode: @${username} is blocked, skipping...`);
         showToast('Skipping @' + username);
-        setTimeout(() => navigateReel('next'), 300);
+        shouldSkip = true;
       } else {
         log(`Discovery mode: @${username} is allowed`);
       }
@@ -1088,11 +1247,25 @@
       if (!allowlist.includes(username)) {
         log(`Whitelist mode: @${username} NOT in allowlist, skipping...`);
         showToast('Not whitelisted: @' + username);
-        setTimeout(() => navigateReel('next'), 300);
+        shouldSkip = true;
       } else {
         log(`Whitelist mode: @${username} is whitelisted, playing`);
       }
     }
+
+    // Track stats
+    if (shouldSkip) {
+      sessionStats.reelsSkipped++;
+      incrementDailyStat('reelsSkipped');
+      log(`[STATS] Reels skipped this session: ${sessionStats.reelsSkipped}`);
+      setTimeout(() => navigateReel('next'), 300);
+    } else {
+      sessionStats.reelsViewed++;
+      incrementDailyStat('reelsViewed');
+    }
+
+    // Check if time reminder is due
+    checkTimeReminder();
   }
 
   // Element protection helpers
@@ -1682,6 +1855,53 @@
     updateStatusBorder();
   }
 
+  // Stats panel
+  let statsUpdateInterval = null;
+
+  function showStatsPanel() {
+    const panel = document.getElementById('instapump-stats-panel');
+    if (panel) {
+      panel.classList.add('visible');
+      renderStatsPanel();
+      // Update stats every second while panel is open
+      statsUpdateInterval = setInterval(renderStatsPanel, 1000);
+    }
+  }
+
+  function hideStatsPanel() {
+    const panel = document.getElementById('instapump-stats-panel');
+    if (panel) panel.classList.remove('visible');
+    // Clear the update interval
+    if (statsUpdateInterval) {
+      clearInterval(statsUpdateInterval);
+      statsUpdateInterval = null;
+    }
+  }
+
+  function renderStatsPanel() {
+    // Session stats
+    const durationEl = document.getElementById('instapump-stat-duration');
+    const skippedEl = document.getElementById('instapump-stat-skipped');
+    const viewedEl = document.getElementById('instapump-stat-viewed');
+    const savedEl = document.getElementById('instapump-stat-saved');
+
+    if (durationEl) durationEl.textContent = getSessionDuration();
+    if (skippedEl) skippedEl.textContent = sessionStats.reelsSkipped;
+    if (viewedEl) viewedEl.textContent = sessionStats.reelsViewed;
+    if (savedEl) savedEl.textContent = getTimeSaved();
+
+    // Daily stats
+    const dailyStats = getDailyStats();
+    const today = getTodayKey();
+    const todayStats = dailyStats[today] || { reelsSkipped: 0, reelsViewed: 0 };
+
+    const dailySkippedEl = document.getElementById('instapump-stat-daily-skipped');
+    const dailyViewedEl = document.getElementById('instapump-stat-daily-viewed');
+
+    if (dailySkippedEl) dailySkippedEl.textContent = todayStats.reelsSkipped;
+    if (dailyViewedEl) dailyViewedEl.textContent = todayStats.reelsViewed;
+  }
+
   // Create UI
   function createUI() {
     console.log('🔧 createUI called, body exists:', !!document.body);
@@ -1730,6 +1950,7 @@
     fab.innerHTML = `
       <button id="instapump-fab-main" class="${currentMode}">${currentMode === 'discovery' ? 'D' : 'W'}</button>
       <div id="instapump-fab-menu">
+        <button class="instapump-fab-btn" id="instapump-btn-stats" title="Stats">${ICONS.stats}</button>
         <button class="instapump-fab-btn" id="instapump-btn-lists" title="View Lists">${ICONS.lists}</button>
         <button class="instapump-fab-btn" id="instapump-btn-picker" title="Element Picker">${ICONS.picker}</button>
         <button class="instapump-fab-btn" id="instapump-btn-logs" title="Logs">${ICONS.logs}</button>
@@ -1788,6 +2009,49 @@
     `;
     document.body.appendChild(listPanel);
 
+    // Stats panel
+    const statsPanel = document.createElement('div');
+    statsPanel.id = 'instapump-stats-panel';
+    statsPanel.innerHTML = `
+      <div class="panel-header">
+        <h3>📊 Session Stats</h3>
+        <button class="panel-close" id="instapump-stats-close">×</button>
+      </div>
+      <div class="stats-content">
+        <div class="stats-section">
+          <div class="stats-section-title">This Session</div>
+          <div class="stat-row">
+            <span class="stat-label">Time scrolling</span>
+            <span class="stat-value" id="instapump-stat-duration">0s</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Reels skipped</span>
+            <span class="stat-value highlight" id="instapump-stat-skipped">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Reels viewed</span>
+            <span class="stat-value" id="instapump-stat-viewed">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Time saved</span>
+            <span class="stat-value highlight" id="instapump-stat-saved">0s</span>
+          </div>
+        </div>
+        <div class="stats-section">
+          <div class="stats-section-title">Today</div>
+          <div class="stat-row">
+            <span class="stat-label">Total skipped</span>
+            <span class="stat-value highlight" id="instapump-stat-daily-skipped">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Total viewed</span>
+            <span class="stat-value" id="instapump-stat-daily-viewed">0</span>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(statsPanel);
+
     // FAB interactions
     const fabMain = document.getElementById('instapump-fab-main');
     let fabPressTimer = null;
@@ -1812,6 +2076,11 @@
       if (fabMenuOpen && !e.target.closest('#instapump-fab')) closeFabMenu();
     });
 
+    document.getElementById('instapump-btn-stats').addEventListener('click', () => {
+      closeFabMenu();
+      showStatsPanel();
+    });
+
     document.getElementById('instapump-btn-lists').addEventListener('click', () => {
       closeFabMenu();
       showListPanel();
@@ -1826,6 +2095,9 @@
       closeFabMenu();
       showLogsPanel();
     });
+
+    // Stats panel interactions
+    document.getElementById('instapump-stats-close').addEventListener('click', hideStatsPanel);
 
     // List panel interactions
     document.getElementById('instapump-list-close').addEventListener('click', hideListPanel);
