@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.51
+// @version      2.1.52
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.51';
+  const VERSION = '2.1.52';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -678,21 +678,27 @@
       color: #0f0;
       font-family: 'SF Mono', Monaco, monospace;
       font-size: 11px;
-      padding: 10px;
-      overflow-y: auto;
       z-index: 1000000;
       display: none;
+      flex-direction: column;
       border-bottom: 2px solid #333;
     }
-    #instapump-logs.visible { display: block; }
+    #instapump-logs.visible { display: flex; }
     #instapump-logs .log-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
-      padding-bottom: 8px;
+      align-items: center;
+      padding: 10px;
       border-bottom: 1px solid #444;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       color: white;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.95);
+    }
+    #instapump-logs-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
     }
     #instapump-logs .log-entry {
       padding: 2px 0;
@@ -907,8 +913,10 @@
     return video.paused ? 'PAUSED' : 'PLAYING';
   }
 
-  // Log touch event details
+  // Log touch event details (only in debug mode)
   function logTouchEvent(eventType, e, extra = '') {
+    if (!debugModeEnabled) return; // Skip touch logging unless debug mode is on
+
     const touch = e.touches?.[0] || e.changedTouches?.[0];
     const x = touch?.clientX?.toFixed(0) || '?';
     const y = touch?.clientY?.toFixed(0) || '?';
