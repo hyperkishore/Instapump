@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.53
+// @version      2.1.54
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.53';
+  const VERSION = '2.1.54';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -1358,9 +1358,14 @@
     const vh = window.innerHeight;
 
     // Pattern 1: Bottom Navigation Bar
-    // Stable: data-visualcompletion="ignore-dynamic" or contains "HomeExplore"
+    // Only hide data-visualcompletion elements that are actually at the bottom (nav bar)
+    // Don't hide ALL of them - some are needed for Instagram's lazy loading
     document.querySelectorAll('[data-visualcompletion="ignore-dynamic"]').forEach(el => {
-      safeHide(el);
+      const rect = el.getBoundingClientRect();
+      // Only hide if it's at the bottom of the screen (nav bar position)
+      if (rect.top > vh - 100 && rect.width > vw * 0.5) {
+        safeHide(el);
+      }
     });
     document.querySelectorAll('div[role="tablist"]').forEach(el => {
       safeHide(el);
