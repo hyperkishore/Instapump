@@ -62,7 +62,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.44
+## Current Version: 2.1.49
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
@@ -78,6 +78,10 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 - **Pattern-Based Hiding**: Auto-hides UI elements across all videos
 - **Clips Overlay Protection**: Audio toggle always works (protected layer)
 - **Version Badge**: Shows current version in top-right corner
+- **Stats Panel**: Session and daily stats (📊 button) - reels skipped/viewed, time saved
+- **Time Reminders**: Gentle 30-minute scrolling reminder with stats summary
+- **Reels-Only Mode**: Extension only runs on /reels and /reel/ pages
+- **SPA Navigation Detection**: UI hides when navigating away from reels
 
 ### Keyboard Shortcuts
 | Key | Action |
@@ -92,6 +96,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 | Icon | Action |
 |------|--------|
 | `D` / `W` | Current mode (tap to toggle, long-press for menu) |
+| 📊 | Stats panel (session + daily stats) |
 | 📝 | List viewer panel |
 | ✂ | Element picker |
 | 📋 | Logs panel |
@@ -103,6 +108,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 - `instapump_blocklist` - Rejected accounts (persists across refreshes)
 - `instapump_mode` - Current mode (discovery/whitelist)
 - `instapump_hiding` - Hiding enabled/disabled
+- `instapump_daily_stats` - Daily stats (reels skipped/viewed per day)
 
 ### Debug API
 ```javascript
@@ -173,6 +179,29 @@ applyModeFilter(@username)
 ---
 
 ## Version History (Recent)
+
+### v2.1.49 - Session stats tracking and time reminders
+- Added session stats tracking (reels skipped, viewed, time spent)
+- Added daily stats persistence in localStorage
+- Added stats panel (📊 icon in FAB menu) with live updates
+- Added 30-minute scrolling time reminder with stats summary
+- Stats panel shows: time scrolling, reels skipped/viewed, time saved
+- Daily stats section shows today's totals
+
+### v2.1.48 - Polling fallback for URL change detection
+- Added 500ms polling interval to catch SPA navigation
+- Catches cases where Instagram's internal navigation doesn't trigger history events
+
+### v2.1.47 - Hide UI when navigating away from reels (SPA)
+- Added `toggleInstaPumpUI(visible)` function to hide/show all UI elements
+- Intercept `history.pushState` and `replaceState`
+- Listen for `popstate` event for back/forward navigation
+- Fixed CSS `<style>` element being hidden with `:not(style)` selector
+
+### v2.1.45-46 - Reels-only functionality
+- Extension only runs on `/reels` and `/reel/` pages
+- Silent exit on non-reels pages (no console output)
+- Fixed `/reel/ABC123` not matching (singular reel URLs)
 
 ### v2.1.44 - Restore missing findVisibleVideo helper
 - Added back `findVisibleVideo()` helper function removed during v2.1.43 cleanup
