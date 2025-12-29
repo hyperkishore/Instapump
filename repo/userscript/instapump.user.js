@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.47
+// @version      2.1.48
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.47';
+  const VERSION = '2.1.48';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -57,29 +57,45 @@
     }
   }
 
-  // Watch for SPA navigation (Instagram uses history API)
+  // Track last known URL to detect changes
+  let lastKnownUrl = window.location.href;
+
+  function handleNavigationChange() {
+    const currentUrl = window.location.href;
+    if (currentUrl === lastKnownUrl) return; // No actual change
+    lastKnownUrl = currentUrl;
+
+    const onReels = isOnReelsPage();
+    console.log(`[InstaPump] URL changed: ${currentUrl}, onReels: ${onReels}`);
+    toggleInstaPumpUI(onReels);
+  }
+
+  // Watch for SPA navigation using multiple methods
   function setupNavigationWatcher() {
-    // Intercept pushState
+    // Method 1: Intercept pushState
     const originalPushState = history.pushState;
     history.pushState = function(...args) {
       originalPushState.apply(this, args);
       handleNavigationChange();
     };
 
-    // Intercept replaceState
+    // Method 2: Intercept replaceState
     const originalReplaceState = history.replaceState;
     history.replaceState = function(...args) {
       originalReplaceState.apply(this, args);
       handleNavigationChange();
     };
 
-    // Listen for back/forward navigation
+    // Method 3: Listen for back/forward navigation
     window.addEventListener('popstate', handleNavigationChange);
-  }
 
-  function handleNavigationChange() {
-    const onReels = isOnReelsPage();
-    toggleInstaPumpUI(onReels);
+    // Method 4: Fallback - Poll for URL changes every 500ms
+    // This catches cases where Instagram uses internal navigation
+    setInterval(() => {
+      if (window.location.href !== lastKnownUrl) {
+        handleNavigationChange();
+      }
+    }, 500);
   }
 
   // Set up navigation watcher immediately
