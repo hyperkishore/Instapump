@@ -12,6 +12,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Mobile responsiveness issues
 - Edge cases and error handling
 
+---
+
+## Chrome Testing Requirement
+
+**IMPORTANT:** After pushing changes, test the extension in Chrome using Claude in Chrome MCP tools:
+
+### Testing Steps:
+1. After `git push`, use `mcp__claude-in-chrome__tabs_context_mcp` to get browser context
+2. Navigate to Instagram Reels: `mcp__claude-in-chrome__navigate` to `https://www.instagram.com/reels/`
+3. Wait for page load (3 seconds)
+4. Take screenshot to verify UI is rendering: `mcp__claude-in-chrome__computer` with `action: screenshot`
+5. Test core functionality:
+   - Scroll through reels (arrow keys or scroll)
+   - Verify videos load properly
+   - Check for console errors: `mcp__claude-in-chrome__read_console_messages`
+
+### Quick Test Sequence:
+```
+1. tabs_context_mcp (get tab ID)
+2. navigate to instagram.com/reels
+3. wait 3 seconds
+4. screenshot (verify UI loads)
+5. scroll down 5+ times
+6. screenshot (verify scrolling works)
+7. read_console_messages (check for errors)
+```
+
+### What to Verify:
+- [ ] Extension UI renders (FAB button visible)
+- [ ] Videos play correctly
+- [ ] Scrolling loads new reels
+- [ ] No JavaScript errors in console
+- [ ] Mode toggle works (if testing that feature)
+
+**Note:** The Chrome extension at `repo/extension/` must be synced with the userscript after changes. The extension loads from the local folder, so reload it in `chrome://extensions/` to pick up changes.
+
+---
+
 # InstaPump
 
 Safari userscript for clean Instagram Reels viewing with account filtering. Also available as Chrome Extension and Electron app.
@@ -62,7 +100,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.49
+## Current Version: 2.1.56
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
