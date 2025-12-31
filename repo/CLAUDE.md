@@ -33,16 +33,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 1. tabs_context_mcp (get tab ID)
 2. navigate to instagram.com/reels
 3. wait 3 seconds
-4. screenshot (verify UI loads)
-5. scroll down 5+ times
-6. screenshot (verify scrolling works)
-7. read_console_messages (check for errors)
+4. screenshot (note the URL and username)
+5. scroll down once
+6. screenshot (verify URL changed to a NEW reel)
+7. repeat scroll+screenshot 3-5 times, verifying URL changes each time
+8. read_console_messages (check for errors)
 ```
 
 ### What to Verify:
 - [ ] Extension UI renders (FAB button visible)
 - [ ] Videos play correctly
-- [ ] Scrolling loads new reels
+- [ ] **Each scroll loads a NEW reel** (URL changes from `/reels/ABC` to `/reels/XYZ`)
+- [ ] Username display updates with each new reel
 - [ ] No JavaScript errors in console
 - [ ] Mode toggle works (if testing that feature)
 
