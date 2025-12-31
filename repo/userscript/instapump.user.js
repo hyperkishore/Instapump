@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.55
+// @version      2.1.56
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.55';
+  const VERSION = '2.1.56';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -144,6 +144,8 @@
     startTime: Date.now(),
     reelsSkipped: 0,
     reelsViewed: 0,
+    watchTimeMs: 0, // Total time spent watching videos
+    lastWatchStart: null, // Timestamp when current video started playing
     lastReminderTime: Date.now(),
     reminderIntervalMs: 30 * 60 * 1000 // 30 minutes
   };
@@ -193,6 +195,34 @@
     const seconds = secondsSaved % 60;
     if (minutes === 0) return `${seconds}s`;
     return `${minutes}m ${seconds}s`;
+  }
+
+  // Get total watch time (time actually spent watching videos)
+  function getWatchTime() {
+    let totalMs = sessionStats.watchTimeMs;
+    // Add current playing time if a video is currently playing
+    if (sessionStats.lastWatchStart) {
+      totalMs += Date.now() - sessionStats.lastWatchStart;
+    }
+    const minutes = Math.floor(totalMs / 60000);
+    const seconds = Math.floor((totalMs % 60000) / 1000);
+    if (minutes === 0) return `${seconds}s`;
+    return `${minutes}m ${seconds}s`;
+  }
+
+  // Track video play/pause for watch time
+  function trackVideoWatchTime(video) {
+    video.addEventListener('play', () => {
+      if (!sessionStats.lastWatchStart) {
+        sessionStats.lastWatchStart = Date.now();
+      }
+    });
+    video.addEventListener('pause', () => {
+      if (sessionStats.lastWatchStart) {
+        sessionStats.watchTimeMs += Date.now() - sessionStats.lastWatchStart;
+        sessionStats.lastWatchStart = null;
+      }
+    });
   }
 
   // Check if it's time for a gentle reminder
@@ -305,6 +335,9 @@
       z-index: 999999;
       opacity: 0.35;
       transition: opacity 0.3s ease;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
     }
     #instapump-fab:hover,
     #instapump-fab.active {
@@ -1127,6 +1160,9 @@
       if (trackedVideos.has(video)) return; // Already tracking
       trackedVideos.add(video);
 
+      // Track watch time for stats
+      trackVideoWatchTime(video);
+
       // Log initial state
       const durStr = (video.duration && !isNaN(video.duration)) ? video.duration.toFixed(1) + 's' : 'loading...';
       log(`Tracking video: duration=${durStr}, readyState=${video.readyState}`);
@@ -1931,11 +1967,13 @@
   function renderStatsPanel() {
     // Session stats
     const durationEl = document.getElementById('instapump-stat-duration');
+    const watchTimeEl = document.getElementById('instapump-stat-watchtime');
     const skippedEl = document.getElementById('instapump-stat-skipped');
     const viewedEl = document.getElementById('instapump-stat-viewed');
     const savedEl = document.getElementById('instapump-stat-saved');
 
     if (durationEl) durationEl.textContent = getSessionDuration();
+    if (watchTimeEl) watchTimeEl.textContent = getWatchTime();
     if (skippedEl) skippedEl.textContent = sessionStats.reelsSkipped;
     if (viewedEl) viewedEl.textContent = sessionStats.reelsViewed;
     if (savedEl) savedEl.textContent = getTimeSaved();
@@ -2065,7 +2103,7 @@
     statsPanel.id = 'instapump-stats-panel';
     statsPanel.innerHTML = `
       <div class="panel-header">
-        <h3>📊 Session Stats</h3>
+        <h3><svg viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:middle;margin-right:8px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Session Stats</h3>
         <button class="panel-close" id="instapump-stats-close">×</button>
       </div>
       <div class="stats-content">
@@ -2074,6 +2112,10 @@
           <div class="stat-row">
             <span class="stat-label">Time scrolling</span>
             <span class="stat-value" id="instapump-stat-duration">0s</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Time watching</span>
+            <span class="stat-value" id="instapump-stat-watchtime">0s</span>
           </div>
           <div class="stat-row">
             <span class="stat-label">Reels skipped</span>
