@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.56
+// @version      2.1.57
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.56';
+  const VERSION = '2.1.57';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -1270,35 +1270,58 @@
       // At end, try to load more by scrolling
       log(`[LOAD MORE] At end (overlay ${currentIdx}/${overlays.length}), attempting to trigger Instagram lazy-load...`);
 
-      // Method 1: Window scroll
-      window.scrollBy({ top: vh, behavior: 'smooth' });
-      log('[LOAD MORE] Method 1: window.scrollBy');
+      // Find the actual scroll container (Instagram uses scroll-snap on this element)
+      // Look for element with scroll-snap-type: y mandatory
+      let scrollContainer = null;
+      document.querySelectorAll('div').forEach(el => {
+        const style = getComputedStyle(el);
+        if (style.scrollSnapType && style.scrollSnapType.includes('y') &&
+            el.scrollHeight > el.clientHeight) {
+          scrollContainer = el;
+        }
+      });
 
-      // Method 2: Scroll the main content area
+      // Debug: Log scroll container state
+      if (scrollContainer) {
+        log(`[LOAD MORE] Found scroll container: scrollTop=${scrollContainer.scrollTop}, scrollHeight=${scrollContainer.scrollHeight}, clientHeight=${scrollContainer.clientHeight}`);
+        log(`[LOAD MORE] Max scroll: ${scrollContainer.scrollHeight - scrollContainer.clientHeight}, remaining: ${scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop}`);
+      } else {
+        log('[LOAD MORE] WARNING: No scroll-snap container found');
+      }
+
+      // Method 1: Scroll the scroll-snap container (most reliable)
+      if (scrollContainer) {
+        const beforeScroll = scrollContainer.scrollTop;
+        scrollContainer.scrollBy({ top: vh, behavior: 'smooth' });
+        log(`[LOAD MORE] Method 1: scrollContainer.scrollBy (from ${beforeScroll})`);
+      }
+
+      // Method 2: Window scroll (fallback)
+      window.scrollBy({ top: vh, behavior: 'smooth' });
+      log('[LOAD MORE] Method 2: window.scrollBy');
+
+      // Method 3: Scroll the main content area
       const mainContent = document.querySelector('main') ||
                           document.querySelector('[role="main"]') ||
                           document.querySelector('section');
-      if (mainContent) {
+      if (mainContent && mainContent.scrollHeight > mainContent.clientHeight) {
         mainContent.scrollBy({ top: vh, behavior: 'smooth' });
-        log('[LOAD MORE] Method 2: mainContent.scrollBy');
-      }
-
-      // Method 3: Try scrolling the last overlay's parent
-      const lastOverlay = overlays[overlays.length - 1];
-      if (lastOverlay) {
-        const scrollParent = lastOverlay.closest('[style*="overflow"]') || lastOverlay.parentElement;
-        if (scrollParent && scrollParent !== document.body) {
-          scrollParent.scrollBy({ top: vh, behavior: 'smooth' });
-          log(`[LOAD MORE] Method 3: scrollParent (${scrollParent.tagName})`);
-        }
+        log('[LOAD MORE] Method 3: mainContent.scrollBy');
       }
 
       // Check if more loaded after delay
       setTimeout(() => {
         const newOverlays = document.querySelectorAll('[id^="clipsoverlay"]');
-        log(`[LOAD MORE] After 2s: ${newOverlays.length} overlays (was ${overlays.length})`);
+        const containerInfo = scrollContainer ?
+          ` scrollTop=${scrollContainer.scrollTop}` : '';
+        log(`[LOAD MORE] After 2s: ${newOverlays.length} overlays (was ${overlays.length})${containerInfo}`);
         if (newOverlays.length === overlays.length) {
           log('[LOAD MORE] WARNING: No new overlays loaded - Instagram may be blocking');
+          // Additional debug info
+          if (scrollContainer) {
+            const atBottom = scrollContainer.scrollTop >= (scrollContainer.scrollHeight - scrollContainer.clientHeight - 10);
+            log(`[LOAD MORE] At bottom of scroll container: ${atBottom}`);
+          }
         }
       }, 2000);
     } else {
@@ -2515,6 +2538,58 @@
     clearSelectors: () => {
       localStorage.removeItem(STORAGE_KEY_SELECTORS);
       showToast('Selectors cleared');
+    },
+    // Debug function to check scroll state
+    debug: () => {
+      const vh = window.innerHeight;
+      const overlays = document.querySelectorAll('[id^="clipsoverlay"]');
+
+      // Find scroll container
+      let scrollContainer = null;
+      document.querySelectorAll('div').forEach(el => {
+        const style = getComputedStyle(el);
+        if (style.scrollSnapType && style.scrollSnapType.includes('y') &&
+            el.scrollHeight > el.clientHeight) {
+          scrollContainer = el;
+        }
+      });
+
+      // Find current visible overlay
+      let currentIdx = -1;
+      let maxVisible = 0;
+      overlays.forEach((overlay, idx) => {
+        const rect = overlay.getBoundingClientRect();
+        const visibleTop = Math.max(rect.top, 0);
+        const visibleBottom = Math.min(rect.bottom, vh);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        if (visibleHeight > maxVisible) {
+          maxVisible = visibleHeight;
+          currentIdx = idx;
+        }
+      });
+
+      const info = {
+        version: VERSION,
+        viewport: { width: window.innerWidth, height: vh },
+        overlays: {
+          count: overlays.length,
+          currentIndex: currentIdx,
+          atEnd: currentIdx === overlays.length - 1
+        },
+        scrollContainer: scrollContainer ? {
+          found: true,
+          scrollTop: scrollContainer.scrollTop,
+          scrollHeight: scrollContainer.scrollHeight,
+          clientHeight: scrollContainer.clientHeight,
+          maxScroll: scrollContainer.scrollHeight - scrollContainer.clientHeight,
+          remaining: scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop,
+          atBottom: scrollContainer.scrollTop >= (scrollContainer.scrollHeight - scrollContainer.clientHeight - 10)
+        } : { found: false },
+        videos: document.querySelectorAll('video').length
+      };
+
+      console.log('[InstaPump Debug]', JSON.stringify(info, null, 2));
+      return info;
     }
   };
 })();

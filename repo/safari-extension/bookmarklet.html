@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaPump Bookmarklet</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 40px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #888;
+      margin-bottom: 40px;
+    }
+    .bookmarklet {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 20px 0;
+      cursor: grab;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .bookmarklet:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    .bookmarklet:active {
+      cursor: grabbing;
+    }
+    .instructions {
+      background: #111;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 30px 0;
+    }
+    .instructions h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: #34c759;
+    }
+    .instructions ol {
+      padding-left: 20px;
+    }
+    .instructions li {
+      margin: 12px 0;
+      line-height: 1.6;
+    }
+    .instructions code {
+      background: #222;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: SF Mono, Monaco, monospace;
+    }
+    .note {
+      background: #1a1a2e;
+      border-left: 4px solid #667eea;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note strong {
+      color: #667eea;
+    }
+    .manual-code {
+      background: #111;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 30px 0;
+    }
+    .manual-code h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: #ff9500;
+    }
+    .manual-code pre {
+      background: #000;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: SF Mono, Monaco, monospace;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .copy-btn {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .copy-btn:hover {
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>InstaPump for Safari</h1>
+    <p class="subtitle">Desktop Safari bookmarklet - click to inject InstaPump on any Instagram page</p>
+
+    <a class="bookmarklet" href="javascript:(function(){if(window.__instapump_loaded){alert('InstaPump already loaded!');return;}var s=document.createElement('script');s.src='https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js?t='+Date.now();s.onload=function(){console.log('InstaPump injected!');};s.onerror=function(){alert('Failed to load InstaPump. Check console for CSP errors.');};document.head.appendChild(s);})();">
+      InstaPump
+    </a>
+
+    <div class="instructions">
+      <h2>How to Install</h2>
+      <ol>
+        <li><strong>Drag the purple button above</strong> to your Safari bookmarks bar</li>
+        <li>Go to <code>instagram.com/reels</code></li>
+        <li><strong>Click the bookmarklet</strong> in your bookmarks bar</li>
+        <li>InstaPump will inject and activate!</li>
+      </ol>
+    </div>
+
+    <div class="note">
+      <strong>Note:</strong> If bookmarklet injection is blocked by CSP (Content Security Policy), use the Console method below instead.
+    </div>
+
+    <div class="manual-code">
+      <h2>Alternative: Safari Developer Console</h2>
+      <p style="margin-bottom: 16px; color: #888;">If the bookmarklet doesn't work, paste this in Safari's Developer Console:</p>
+      <pre id="console-code">fetch('https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js')
+  .then(r => r.text())
+  .then(code => {
+    // Extract IIFE (skip userscript header)
+    const start = code.indexOf('(function()');
+    if (start === -1) throw new Error('Invalid script');
+    eval(code.substring(start));
+    console.log('InstaPump loaded!');
+  })
+  .catch(e => console.error('Failed:', e));</pre>
+      <button class="copy-btn" onclick="copyCode()">Copy to Clipboard</button>
+    </div>
+
+    <div class="instructions">
+      <h2>Enable Safari Developer Tools</h2>
+      <ol>
+        <li>Open Safari Preferences (<code>Cmd + ,</code>)</li>
+        <li>Go to <strong>Advanced</strong> tab</li>
+        <li>Check <strong>"Show Develop menu in menu bar"</strong></li>
+        <li>Go to instagram.com/reels</li>
+        <li>Open Console: <code>Cmd + Option + C</code></li>
+        <li>Paste the code above and press Enter</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    function copyCode() {
+      const code = document.getElementById('console-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000);
+      });
+    }
+  </script>
+</body>
+</html>
