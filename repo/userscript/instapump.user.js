@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.57
+// @version      2.1.58
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.57';
+  const VERSION = '2.1.58';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -2027,15 +2027,22 @@
     versionBadge.textContent = `v${VERSION}`;
     versionBadge.addEventListener('click', () => {
       if (versionBadge.classList.contains('outdated')) {
-        window.open('https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump.user.js', '_blank');
+        if (LOADED_VIA_LOADER) {
+          // Clear loader cache and reload to get new version
+          showToast('Updating...');
+          localStorage.removeItem('instapump_cached_code');
+          localStorage.removeItem('instapump_cached_version');
+          setTimeout(() => location.reload(), 500);
+        } else {
+          // Open download URL for standalone userscript
+          window.open('https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump.user.js', '_blank');
+        }
       }
     });
     document.body.appendChild(versionBadge);
 
-    // Check for updates after 3 seconds (skip if loader is managing updates)
-    if (!LOADED_VIA_LOADER) {
-      setTimeout(checkForUpdates, 3000);
-    }
+    // Check for updates after 3 seconds (works for both loader and standalone)
+    setTimeout(checkForUpdates, 3000);
 
     // Username display
     const usernameDisplay = document.createElement('div');
