@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump Loader
 // @namespace    https://instapump.app
-// @version      1.1.0
+// @version      1.2.0
 // @description  Auto-updating loader for InstaPump
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,8 +16,22 @@
   const SCRIPT_URL = 'https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js';
   const CACHE_KEY = 'instapump_cached_code';
   const VERSION_KEY = 'instapump_cached_version';
-  const LOADER_VERSION = '1.1.0';
+  const LOADER_VERSION = '1.2.0';
   const FETCH_TIMEOUT_MS = 3000; // Max wait for fresh code before falling back to cache
+
+  // Check for force reload via URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceReload = urlParams.get('instapump_reload') === '1';
+
+  if (forceReload) {
+    console.log('[InstaPump Loader] Force reload requested via URL');
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(VERSION_KEY);
+    // Remove the parameter from URL to prevent infinite reload
+    urlParams.delete('instapump_reload');
+    const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+    window.history.replaceState({}, '', newUrl);
+  }
 
   // Prevent double execution
   if (window.__instapump_loaded) return;
@@ -25,6 +39,21 @@
   window.__instapump_loader = true;  // Signal to main script that loader is managing updates
 
   console.log(`🚀 InstaPump Loader v${LOADER_VERSION}`);
+
+  // Expose force reload function globally
+  window.instapump_reload = function() {
+    console.log('[InstaPump Loader] Force reload triggered');
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(VERSION_KEY);
+    location.reload();
+  };
+
+  // Clear cache function (without reload)
+  window.instapump_clear_cache = function() {
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(VERSION_KEY);
+    console.log('[InstaPump Loader] Cache cleared. Reload page to fetch fresh code.');
+  };
 
   // Execute code in content script context (bypasses page CSP)
   function executeCode(code) {
