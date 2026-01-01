@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "InstaScript - InstaPump Loader",
+  "version": "1.0.0",
+  "description": "Loads InstaPump userscript on Instagram for Safari",
+  "permissions": [],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "https://instagram.com/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.instagram.com/reels*",
+        "https://www.instagram.com/reel/*",
+        "https://instagram.com/reels*",
+        "https://instagram.com/reel/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}
