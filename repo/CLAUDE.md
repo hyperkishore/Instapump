@@ -867,3 +867,202 @@ This guides users through the Userscripts popup install flow, which is simpler t
 3. **Movement-based marketing** - Users join a tribe, not just download software
 4. **Counter-positioning** - "Algorithm" is the enemy, user autonomy is the hero
 5. **Specificity over vagueness** - Real numbers, concrete transformations
+
+---
+
+## Safari Web Extension (App Store)
+
+### Overview
+
+Native Safari Web Extension for iOS 15+ and macOS 12+, distributed via App Store. Contains full InstaPump functionality embedded (not loaded from GitHub).
+
+**Location:** `repo/safari-extension/instapump-appstore/`
+
+### Architecture
+
+```
+instapump-appstore/
+├── manifest.json              # Manifest V3 (Safari-compatible)
+├── content.js                 # Full InstaPump (~2,678 lines)
+├── background.js              # Minimal service worker
+├── popup/
+│   ├── popup.html             # Settings popup UI
+│   ├── popup.css              # Dark theme styling
+│   └── popup.js               # Uses browser.tabs.sendMessage
+├── images/
+│   └── icon-{16-512}.png      # Extension icons
+├── generate_icons.py          # Icon generation script (requires Pillow)
+├── generate_xcode_project.sh  # Xcode project generator
+└── README.md                  # Setup instructions
+```
+
+### Key Technical Decisions
+
+1. **Embedded code (not loader)** - App Store requires no remote code execution
+2. **browser.* APIs** - Safari uses `browser.tabs.sendMessage`, NOT `chrome.scripting.executeScript`
+3. **localStorage only** - No `chrome.storage` available; content script manages all state
+4. **Message-based communication** - Popup sends messages to content script
+
+### Message Protocol (Popup ↔ Content Script)
+
+| Message Type | Direction | Purpose |
+|--------------|-----------|---------|
+| `GET_STATE` | popup → content | Get mode, lists, stats, version |
+| `SET_MODE` | popup → content | Change to discovery/whitelist |
+| `IMPORT_ALLOWLIST` | popup → content | Add usernames to allowlist |
+| `CLEAR_LISTS` | popup → content | Clear all lists |
+| `REMOVE_FROM_LIST` | popup → content | Remove single username |
+
+**Content script listener location:** End of `content.js` (lines 2597-2677)
+
+### Milestones Progress
+
+| Milestone | Status | Description |
+|-----------|--------|-------------|
+| M1 | ✅ Done | Extension structure + manifest.json |
+| M2 | ✅ Done | Embed InstaPump + message listeners |
+| M3 | ✅ Done | Popup UI (HTML/CSS/JS) |
+| M4 | ✅ Done | Generate icons (16-512px) |
+| M5 | ✅ Done | Xcode generation script |
+| M6 | ⏳ Pending | Customize iOS SwiftUI onboarding |
+| M7 | ⏳ Pending | Customize macOS onboarding |
+| M8 | ⏳ Pending | Test on macOS Safari |
+| M9 | ⏳ Pending | Test on iOS Simulator |
+| M10 | ⏳ Pending | Final polish + documentation |
+
+### Continuing Development (Once Xcode Installed)
+
+**Step 1: Generate Xcode Project**
+```bash
+cd repo/safari-extension/instapump-appstore
+./generate_xcode_project.sh
+```
+
+Or manually:
+```bash
+xcrun safari-web-extension-converter . \
+  --project-location ../InstaPump-Xcode \
+  --app-name "InstaPump" \
+  --bundle-identifier "com.instapump.safari" \
+  --swift \
+  --copy-resources
+```
+
+**Step 2: Open in Xcode**
+```bash
+open ../InstaPump-Xcode/InstaPump.xcodeproj
+```
+
+**Step 3: Configure Signing**
+- Select project in navigator
+- For each target (macOS app, iOS app, macOS extension, iOS extension):
+  - Set Team to Apple Developer account
+  - Xcode auto-generates signing certificates
+
+**Step 4: Build & Run**
+- macOS: Select "InstaPump (macOS)" scheme → Cmd+R
+- iOS Simulator: Select "InstaPump (iOS)" scheme + simulator → Cmd+R
+- iOS Device: Connect iPhone, select device → Cmd+R
+
+**Step 5: Enable Extension**
+- macOS: Safari → Settings → Extensions → Enable InstaPump
+- iOS: Settings → Safari → Extensions → Enable InstaPump
+
+**Step 6: Test**
+- Navigate to https://www.instagram.com/reels/
+- Verify FAB appears, mode toggle works, swipe gestures work
+- Test popup (click extension icon)
+
+### M6: iOS SwiftUI Onboarding (TODO)
+
+After Xcode project generation, customize `InstaPump iOS/ContentView.swift`:
+
+```swift
+// Key components to add:
+// 1. App icon/logo display
+// 2. Step-by-step enable instructions
+// 3. "Open Safari Settings" button
+// 4. "Open Instagram Reels" button
+```
+
+### M7: macOS Onboarding (TODO)
+
+Customize `InstaPump/ViewController.swift` or convert to SwiftUI:
+- Similar to iOS but with macOS-specific UI
+- Link to Safari Preferences for enabling extension
+
+### Testing Checklist
+
+| Feature | iOS | macOS |
+|---------|-----|-------|
+| Extension loads on /reels | [ ] | [ ] |
+| FAB appears bottom-right | [ ] | [ ] |
+| Mode toggle (tap FAB) | [ ] | [ ] |
+| Swipe right = approve | [ ] | n/a |
+| Swipe left = reject | [ ] | n/a |
+| Keyboard shortcuts | n/a | [ ] |
+| Popup opens | [ ] | [ ] |
+| Popup shows counts | [ ] | [ ] |
+| Import accounts | [ ] | [ ] |
+| Export accounts | [ ] | [ ] |
+| Clear all | [ ] | [ ] |
+| Stats panel (long-press FAB) | [ ] | [ ] |
+| Auto-advance | [ ] | [ ] |
+| UI hiding | [ ] | [ ] |
+
+### Differences from Chrome Extension
+
+| Aspect | Chrome | Safari |
+|--------|--------|--------|
+| Storage | `chrome.storage.local` | `localStorage` only |
+| Script injection | `chrome.scripting.executeScript` | Not available |
+| Communication | Direct + storage | `browser.tabs.sendMessage` only |
+| Popup | Can access storage directly | Must message content script |
+| Distribution | Chrome Web Store | App Store (requires Xcode) |
+
+### Troubleshooting
+
+**"safari-web-extension-converter not found"**
+- Install full Xcode (not just Command Line Tools)
+- Run: `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
+
+**Popup shows "Open Instagram Reels first"**
+- Content script only loads on /reels pages
+- Navigate to instagram.com/reels in Safari
+
+**Extension not appearing in Safari**
+- Check Safari → Settings → Extensions
+- Make sure extension is enabled
+- Allow for instagram.com domain
+
+**Icons look wrong**
+- Re-run: `/opt/homebrew/bin/python3.11 generate_icons.py`
+- Requires Pillow: `pip3 install pillow`
+
+### File Modification Notes
+
+**To update InstaPump logic:**
+1. Edit `content.js` directly (it's the full embedded userscript)
+2. Message listener is at the end (lines 2597-2677)
+3. Version is at line 13: `const VERSION = '1.0.0';`
+
+**To update popup UI:**
+1. Edit `popup/popup.html` for structure
+2. Edit `popup/popup.css` for styling
+3. Edit `popup/popup.js` for logic
+
+**To regenerate icons:**
+```bash
+cd repo/safari-extension/instapump-appstore
+/opt/homebrew/bin/python3.11 generate_icons.py
+```
+
+### App Store Submission (Future)
+
+1. Archive in Xcode: Product → Archive
+2. Distribute: Window → Organizer → Distribute App
+3. App Store Connect:
+   - Create app listing
+   - Upload screenshots (iPhone 6.5", iPad 12.9", Mac)
+   - Fill metadata, privacy policy
+   - Submit for review
