@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Commit Requirement
+
+**IMPORTANT:** Git commit and push after every milestone.
+
+---
+
 ## Code Review Requirement
 
 **IMPORTANT:** Before committing any code changes, perform at least 2 rounds of code review checking for:
