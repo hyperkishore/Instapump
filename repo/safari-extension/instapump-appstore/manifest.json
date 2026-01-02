@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "InstaPump",
+  "version": "1.0.0",
+  "description": "Clean Instagram Reels experience with account filtering. Swipe to approve/reject, toggle modes, and curate your feed.",
+  "permissions": [],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "https://instagram.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.instagram.com/reels*",
+        "https://www.instagram.com/reel/*",
+        "https://instagram.com/reels*",
+        "https://instagram.com/reel/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "images/icon-16.png",
+      "32": "images/icon-32.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "64": "images/icon-64.png",
+    "96": "images/icon-96.png",
+    "128": "images/icon-128.png",
+    "256": "images/icon-256.png",
+    "512": "images/icon-512.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
