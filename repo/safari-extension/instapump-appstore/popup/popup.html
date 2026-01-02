@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstaPump</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1><span>InstaPump</span></h1>
+
+  <!-- Mode Toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn" id="mode-whitelist">Whitelist Only</button>
+    <button class="mode-btn" id="mode-discovery">Discovery</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat approved">
+      <div class="stat-value" id="approved-count">0</div>
+      <div class="stat-label">Whitelisted</div>
+    </div>
+    <div class="stat rejected">
+      <div class="stat-value" id="rejected-count">0</div>
+      <div class="stat-label">Blocked</div>
+    </div>
+  </div>
+
+  <!-- Import Section -->
+  <div class="import-section">
+    <div class="section-title" style="margin-bottom: 8px;">Import Accounts</div>
+    <textarea id="import-input" placeholder="Paste usernames here (one per line, comma-separated, or space-separated)
+
+Example:
+user1
+user2, user3
+@user4"></textarea>
+    <div class="import-actions">
+      <button class="btn-success btn-small" id="import-btn">Import to Whitelist</button>
+      <button class="btn-secondary btn-small" id="export-btn">Export</button>
+    </div>
+  </div>
+
+  <div class="status-msg" id="status-msg"></div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Whitelisted Accounts</span>
+    </div>
+    <div class="list" id="allowlist"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" id="open-reels">Open Reels</button>
+    <button class="btn-danger" id="clear-all">Clear All</button>
+  </div>
+
+  <div class="shortcuts">
+    <h3>Gestures & Shortcuts</h3>
+    <div class="shortcut"><span>Approve</span><span>Swipe Right / <kbd>→</kbd></span></div>
+    <div class="shortcut"><span>Reject</span><span>Swipe Left / <kbd>←</kbd></span></div>
+    <div class="shortcut"><span>Navigate</span><span>Swipe Up/Down</span></div>
+    <div class="shortcut"><span>Toggle Mode</span><span>Tap FAB / <kbd>M</kbd></span></div>
+  </div>
+
+  <div class="version" id="version">v1.0.0</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
