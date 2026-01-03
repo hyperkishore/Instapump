@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.61
+// @version      2.1.62
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.61';
+  const VERSION = '2.1.62';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -1251,12 +1251,13 @@
         const timeSinceNearEnd = now - wasNearEndTime;
 
         // Only consider it a loop if:
-        // 1. Video was near end within last 500ms (not stale data)
+        // 1. Video was near end within last 2000ms (not stale data)
+        //    Note: wasNearEnd is set when timeLeft < 1s, so valid loops take ~1000ms+
         // 2. Seeking to beginning (currentTime < 1)
         // 3. Video is visible
         if (video.dataset.wasNearEnd === 'true' &&
             video.currentTime < 1 &&
-            timeSinceNearEnd < 500) {
+            timeSinceNearEnd < 2000) {
           video.dataset.wasNearEnd = 'false';
           delete video.dataset.wasNearEndTime;
           if (isVisibleVideo(video)) {

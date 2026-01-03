@@ -1,12 +1,31 @@
+// ==UserScript==
+// @name         InstaPump - Clean Reels Experience
+// @namespace    https://instapump.app
+// @version      2.1.62
+// @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
+// @author       InstaPump
+// @match        https://www.instagram.com/*
+// @match        https://instagram.com/*
+// @grant        none
+// @run-at       document-start
+// @updateURL    https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js
+// @downloadURL  https://raw.githubusercontent.com/hyperkishore/Instapump/main/repo/userscript/instapump.user.js
+// ==/UserScript==
 
 (function() {
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.56';
+  const VERSION = '2.1.62';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
+
+  // Check if running as Safari Web Extension
+  const IS_SAFARI_EXTENSION = typeof browser !== 'undefined' && browser.runtime && browser.runtime.id;
+
+  // App Store URL for Safari extension updates (update after publishing)
+  const APP_STORE_URL = 'https://apps.apple.com/app/instapump/id0000000000';
 
   // Helper function to check if current page is a reels page
   function isOnReelsPage() {
@@ -21,7 +40,8 @@
   }
 
   // Confirm script is loading (only shows on reels pages now)
-  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${LOADED_VIA_LOADER ? ' (via loader)' : ''}`);
+  const loadSource = IS_SAFARI_EXTENSION ? ' (Safari Extension)' : (LOADED_VIA_LOADER ? ' (via loader)' : '');
+  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${loadSource}`);
 
   // Track UI visibility state
   let instapumpUIVisible = true;
@@ -270,6 +290,37 @@
     /* Black background */
     body, html {
       background: black !important;
+    }
+
+    /* Full-screen video layout - remove gaps */
+    main, main > div, main > section {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Force videos to fill viewport */
+    video {
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important; /* Dynamic viewport height for mobile */
+      object-fit: cover !important;
+    }
+
+    /* Ensure black background on all containers */
+    main, main * {
+      background-color: black !important;
+    }
+
+    /* Fix clip overlay containers */
+    [id^="clipsoverlay"] {
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
     }
 
     /* Hide scrollbars */
@@ -1113,16 +1164,31 @@
   // Auto-advance: track videos and move to next when finished
   const trackedVideos = new WeakSet();
   let lastAdvanceTime = 0;
-  const ADVANCE_DEBOUNCE_MS = 1000; // Prevent multiple advances within 1 second
+  let lastAdvanceVideo = null; // Track which video triggered last advance
+  const ADVANCE_DEBOUNCE_MS = 1500; // Increased to 1.5s to prevent rapid advances
 
-  function debounceAdvance(reason) {
+  // Track navigation direction to allow going back without auto-skip
+  let lastNavigationDirection = null;
+  let navigationCooldownUntil = 0;
+
+  function debounceAdvance(reason, video = null) {
     const now = Date.now();
+
+    // Block if within debounce period
     if (now - lastAdvanceTime < ADVANCE_DEBOUNCE_MS) {
-      log(`Advance blocked (debounce): ${reason}`);
+      log(`[AUTO-ADV] Blocked (debounce ${ADVANCE_DEBOUNCE_MS}ms): ${reason}`);
       return false;
     }
+
+    // Block if same video triggered advance recently (prevents double-triggers)
+    if (video && video === lastAdvanceVideo && now - lastAdvanceTime < 3000) {
+      log(`[AUTO-ADV] Blocked (same video within 3s): ${reason}`);
+      return false;
+    }
+
     lastAdvanceTime = now;
-    log(`Advancing: ${reason}`);
+    lastAdvanceVideo = video;
+    log(`[AUTO-ADV] Advancing: ${reason}`);
     return true;
   }
 
@@ -1159,25 +1225,51 @@
         log(`Video metadata loaded: duration=${video.duration?.toFixed(1)}s`);
       });
 
+      // CRITICAL: Reset all auto-advance state when new video loads
+      // This prevents false positives when Instagram reuses video elements
+      video.addEventListener('loadstart', () => {
+        log('[AUTO-ADV] Video loadstart - resetting all advance state');
+        video.dataset.wasNearEnd = 'false';
+        delete video.dataset.wasNearEndTime;
+        delete video.dataset.advanceTriggered;
+      });
+
       // When video ends, go to next (if this is the visible video)
       video.addEventListener('ended', () => {
         if (isVisibleVideo(video)) {
-          if (debounceAdvance('video ended')) {
+          if (debounceAdvance('video ended', video)) {
             setTimeout(() => navigateReel('next'), 300);
           }
         }
       });
 
       // Track when video loops (seeking event fires when Instagram loops the video)
+      // IMPORTANT: Only trigger if we JUST saw the video near end (within 500ms)
       video.addEventListener('seeking', () => {
-        // If video was near end and suddenly seeks to beginning, it looped
-        if (video.dataset.wasNearEnd === 'true' && video.currentTime < 1) {
+        const now = Date.now();
+        const wasNearEndTime = parseInt(video.dataset.wasNearEndTime || '0', 10);
+        const timeSinceNearEnd = now - wasNearEndTime;
+
+        // Only consider it a loop if:
+        // 1. Video was near end within last 2000ms (not stale data)
+        //    Note: wasNearEnd is set when timeLeft < 1s, so valid loops take ~1000ms+
+        // 2. Seeking to beginning (currentTime < 1)
+        // 3. Video is visible
+        if (video.dataset.wasNearEnd === 'true' &&
+            video.currentTime < 1 &&
+            timeSinceNearEnd < 2000) {
           video.dataset.wasNearEnd = 'false';
+          delete video.dataset.wasNearEndTime;
           if (isVisibleVideo(video)) {
-            if (debounceAdvance('video looped')) {
+            if (debounceAdvance('video looped', video)) {
               setTimeout(() => navigateReel('next'), 300);
             }
           }
+        } else if (video.dataset.wasNearEnd === 'true') {
+          // Stale data - reset it
+          log(`[AUTO-ADV] Ignoring stale wasNearEnd (${timeSinceNearEnd}ms old)`);
+          video.dataset.wasNearEnd = 'false';
+          delete video.dataset.wasNearEndTime;
         }
       });
 
@@ -1189,17 +1281,20 @@
         const timeLeft = video.duration - video.currentTime;
 
         // Mark as near end when in last 1 second
+        // Also record timestamp so we can detect stale data
         if (timeLeft < 1 && timeLeft >= 0) {
           video.dataset.wasNearEnd = 'true';
+          video.dataset.wasNearEndTime = Date.now().toString();
         }
 
-        // When video is near the end (last 0.3 seconds) - tighter threshold
-        if (timeLeft < 0.3 && timeLeft >= 0 && video.currentTime > 1) {
+        // When video is near the end (last 0.2 seconds) - only trigger very close to end
+        // Increased from 0.3 to be less aggressive
+        if (timeLeft < 0.2 && timeLeft >= 0 && video.currentTime > 2) {
           if (isVisibleVideo(video)) {
             // Only trigger once per play-through
             if (!video.dataset.advanceTriggered) {
               video.dataset.advanceTriggered = 'true';
-              if (debounceAdvance(`video at ${(video.currentTime / video.duration * 100).toFixed(0)}%`)) {
+              if (debounceAdvance(`video at ${(video.currentTime / video.duration * 100).toFixed(0)}%`, video)) {
                 setTimeout(() => navigateReel('next'), 300);
               }
             }
@@ -1215,9 +1310,19 @@
   }
 
   // Navigation - find and scroll the correct container
-  function navigateReel(direction) {
+  function navigateReel(direction, isAutoSkip = false) {
     const vh = window.innerHeight;
     const overlays = Array.from(document.querySelectorAll('[id^="clipsoverlay"]'));
+
+    // Track navigation direction for mode filter cooldown
+    if (!isAutoSkip) {
+      lastNavigationDirection = direction;
+      // Give 2 second cooldown when going back to prevent immediate re-skip
+      if (direction === 'prev') {
+        navigationCooldownUntil = Date.now() + 2000;
+        log('[NAV] Going back - mode filter cooldown active for 2s');
+      }
+    }
 
     log(`navigateReel(${direction}): ${overlays.length} overlays in DOM`);
 
@@ -1257,35 +1362,58 @@
       // At end, try to load more by scrolling
       log(`[LOAD MORE] At end (overlay ${currentIdx}/${overlays.length}), attempting to trigger Instagram lazy-load...`);
 
-      // Method 1: Window scroll
-      window.scrollBy({ top: vh, behavior: 'smooth' });
-      log('[LOAD MORE] Method 1: window.scrollBy');
+      // Find the actual scroll container (Instagram uses scroll-snap on this element)
+      // Look for element with scroll-snap-type: y mandatory
+      let scrollContainer = null;
+      document.querySelectorAll('div').forEach(el => {
+        const style = getComputedStyle(el);
+        if (style.scrollSnapType && style.scrollSnapType.includes('y') &&
+            el.scrollHeight > el.clientHeight) {
+          scrollContainer = el;
+        }
+      });
 
-      // Method 2: Scroll the main content area
+      // Debug: Log scroll container state
+      if (scrollContainer) {
+        log(`[LOAD MORE] Found scroll container: scrollTop=${scrollContainer.scrollTop}, scrollHeight=${scrollContainer.scrollHeight}, clientHeight=${scrollContainer.clientHeight}`);
+        log(`[LOAD MORE] Max scroll: ${scrollContainer.scrollHeight - scrollContainer.clientHeight}, remaining: ${scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop}`);
+      } else {
+        log('[LOAD MORE] WARNING: No scroll-snap container found');
+      }
+
+      // Method 1: Scroll the scroll-snap container (most reliable)
+      if (scrollContainer) {
+        const beforeScroll = scrollContainer.scrollTop;
+        scrollContainer.scrollBy({ top: vh, behavior: 'smooth' });
+        log(`[LOAD MORE] Method 1: scrollContainer.scrollBy (from ${beforeScroll})`);
+      }
+
+      // Method 2: Window scroll (fallback)
+      window.scrollBy({ top: vh, behavior: 'smooth' });
+      log('[LOAD MORE] Method 2: window.scrollBy');
+
+      // Method 3: Scroll the main content area
       const mainContent = document.querySelector('main') ||
                           document.querySelector('[role="main"]') ||
                           document.querySelector('section');
-      if (mainContent) {
+      if (mainContent && mainContent.scrollHeight > mainContent.clientHeight) {
         mainContent.scrollBy({ top: vh, behavior: 'smooth' });
-        log('[LOAD MORE] Method 2: mainContent.scrollBy');
-      }
-
-      // Method 3: Try scrolling the last overlay's parent
-      const lastOverlay = overlays[overlays.length - 1];
-      if (lastOverlay) {
-        const scrollParent = lastOverlay.closest('[style*="overflow"]') || lastOverlay.parentElement;
-        if (scrollParent && scrollParent !== document.body) {
-          scrollParent.scrollBy({ top: vh, behavior: 'smooth' });
-          log(`[LOAD MORE] Method 3: scrollParent (${scrollParent.tagName})`);
-        }
+        log('[LOAD MORE] Method 3: mainContent.scrollBy');
       }
 
       // Check if more loaded after delay
       setTimeout(() => {
         const newOverlays = document.querySelectorAll('[id^="clipsoverlay"]');
-        log(`[LOAD MORE] After 2s: ${newOverlays.length} overlays (was ${overlays.length})`);
+        const containerInfo = scrollContainer ?
+          ` scrollTop=${scrollContainer.scrollTop}` : '';
+        log(`[LOAD MORE] After 2s: ${newOverlays.length} overlays (was ${overlays.length})${containerInfo}`);
         if (newOverlays.length === overlays.length) {
           log('[LOAD MORE] WARNING: No new overlays loaded - Instagram may be blocking');
+          // Additional debug info
+          if (scrollContainer) {
+            const atBottom = scrollContainer.scrollTop >= (scrollContainer.scrollHeight - scrollContainer.clientHeight - 10);
+            log(`[LOAD MORE] At bottom of scroll container: ${atBottom}`);
+          }
         }
       }, 2000);
     } else {
@@ -1326,7 +1454,16 @@
       sessionStats.reelsSkipped++;
       incrementDailyStat('reelsSkipped');
       log(`[STATS] Reels skipped this session: ${sessionStats.reelsSkipped}`);
-      setTimeout(() => navigateReel('next'), 300);
+
+      // Check if we're in navigation cooldown (user went back to review)
+      const now = Date.now();
+      if (now < navigationCooldownUntil) {
+        log(`[NAV] Cooldown active - NOT auto-skipping (${Math.round((navigationCooldownUntil - now) / 1000)}s left)`);
+        showToast('Review mode - swipe to skip');
+      } else {
+        // Normal auto-skip
+        setTimeout(() => navigateReel('next', true), 300);
+      }
     } else {
       sessionStats.reelsViewed++;
       incrementDailyStat('reelsViewed');
@@ -1991,15 +2128,26 @@
     versionBadge.textContent = `v${VERSION}`;
     versionBadge.addEventListener('click', () => {
       if (versionBadge.classList.contains('outdated')) {
-        window.open('https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump.user.js', '_blank');
+        if (IS_SAFARI_EXTENSION) {
+          // Open App Store for Safari extension update
+          showToast('Opening App Store...');
+          window.open(APP_STORE_URL, '_blank');
+        } else if (LOADED_VIA_LOADER) {
+          // Clear loader cache and reload to get new version
+          showToast('Updating...');
+          localStorage.removeItem('instapump_cached_code');
+          localStorage.removeItem('instapump_cached_version');
+          setTimeout(() => location.reload(), 500);
+        } else {
+          // Open download URL for standalone userscript
+          window.open('https://github.com/hyperkishore/Instapump/raw/main/repo/userscript/instapump.user.js', '_blank');
+        }
       }
     });
     document.body.appendChild(versionBadge);
 
-    // Check for updates after 3 seconds (skip if loader is managing updates)
-    if (!LOADED_VIA_LOADER) {
-      setTimeout(checkForUpdates, 3000);
-    }
+    // Check for updates after 3 seconds (works for both loader and standalone)
+    setTimeout(checkForUpdates, 3000);
 
     // Username display
     const usernameDisplay = document.createElement('div');
@@ -2502,6 +2650,58 @@
     clearSelectors: () => {
       localStorage.removeItem(STORAGE_KEY_SELECTORS);
       showToast('Selectors cleared');
+    },
+    // Debug function to check scroll state
+    debug: () => {
+      const vh = window.innerHeight;
+      const overlays = document.querySelectorAll('[id^="clipsoverlay"]');
+
+      // Find scroll container
+      let scrollContainer = null;
+      document.querySelectorAll('div').forEach(el => {
+        const style = getComputedStyle(el);
+        if (style.scrollSnapType && style.scrollSnapType.includes('y') &&
+            el.scrollHeight > el.clientHeight) {
+          scrollContainer = el;
+        }
+      });
+
+      // Find current visible overlay
+      let currentIdx = -1;
+      let maxVisible = 0;
+      overlays.forEach((overlay, idx) => {
+        const rect = overlay.getBoundingClientRect();
+        const visibleTop = Math.max(rect.top, 0);
+        const visibleBottom = Math.min(rect.bottom, vh);
+        const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+        if (visibleHeight > maxVisible) {
+          maxVisible = visibleHeight;
+          currentIdx = idx;
+        }
+      });
+
+      const info = {
+        version: VERSION,
+        viewport: { width: window.innerWidth, height: vh },
+        overlays: {
+          count: overlays.length,
+          currentIndex: currentIdx,
+          atEnd: currentIdx === overlays.length - 1
+        },
+        scrollContainer: scrollContainer ? {
+          found: true,
+          scrollTop: scrollContainer.scrollTop,
+          scrollHeight: scrollContainer.scrollHeight,
+          clientHeight: scrollContainer.clientHeight,
+          maxScroll: scrollContainer.scrollHeight - scrollContainer.clientHeight,
+          remaining: scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop,
+          atBottom: scrollContainer.scrollTop >= (scrollContainer.scrollHeight - scrollContainer.clientHeight - 10)
+        } : { found: false },
+        videos: document.querySelectorAll('video').length
+      };
+
+      console.log('[InstaPump Debug]', JSON.stringify(info, null, 2));
+      return info;
     }
   };
 })();
