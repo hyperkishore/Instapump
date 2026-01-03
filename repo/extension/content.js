@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.64';
+  const VERSION = '2.1.65';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -1353,7 +1353,23 @@
       // Scroll target overlay into view
       const targetOverlay = overlays[targetIdx];
       log(`Scrolling to overlay ${targetIdx} via scrollIntoView`);
-      targetOverlay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Use 'center' block for more reliable centering on iOS
+      targetOverlay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Fallback: also try scrolling the scroll container directly
+      setTimeout(() => {
+        const rect = targetOverlay.getBoundingClientRect();
+        if (Math.abs(rect.top) > 50) {
+          // scrollIntoView didn't work well, try manual scroll
+          log(`[NAV] Fallback scroll - rect.top=${rect.top}`);
+          window.scrollBy({ top: rect.top, behavior: 'smooth' });
+        }
+      }, 300);
+    } else if (direction === 'prev' && targetIdx < 0) {
+      // At beginning, scroll up anyway to show we're at the top
+      log('[NAV] Already at first reel, scrolling up slightly');
+      window.scrollBy({ top: -vh * 0.5, behavior: 'smooth' });
     } else if (direction === 'next') {
       // At end, try to load more by scrolling
       log(`[LOAD MORE] At end (overlay ${currentIdx}/${overlays.length}), attempting to trigger Instagram lazy-load...`);
