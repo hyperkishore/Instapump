@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.63';
+  const VERSION = '2.1.64';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -303,25 +303,20 @@
       box-sizing: border-box !important;
     }
 
-    /* Force videos to fill viewport - commented out due to iOS issues
-    video {
+    /* Center video vertically in container */
+    [id^="clipsoverlay"] {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100vw !important;
       height: 100vh !important;
       height: 100dvh !important;
-      object-fit: cover !important;
-    }
-    */
-
-    /* Black background on main container only (not children to avoid hiding video) */
-    main {
       background-color: black !important;
     }
 
-    /* Fix clip overlay containers */
-    [id^="clipsoverlay"] {
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
+    /* Black background on main container */
+    main {
+      background-color: black !important;
     }
 
     /* Hide scrollbars */
