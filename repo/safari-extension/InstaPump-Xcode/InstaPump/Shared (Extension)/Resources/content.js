@@ -2,18 +2,18 @@
  * InstaPump - Safari Web Extension Content Script
  * Clean Instagram Reels experience with account filtering
  *
- * Version: 1.0.0 (Safari Extension)
- * Based on InstaPump userscript v2.1.58
+ * Version: 2.1.58 (Safari Extension)
+ * Synced from InstaPump userscript v2.1.58
  */
 
 (function() {
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '1.0.0';
+  const VERSION = '2.1.58';
 
-  // Safari extension mode (no loader)
-  const LOADED_VIA_LOADER = false;
+  // Check if loaded via loader (loader manages updates)
+  const LOADED_VIA_LOADER = window.__instapump_loader === true;
 
   // Helper function to check if current page is a reels page
   function isOnReelsPage() {
@@ -285,6 +285,63 @@
     }
     * {
       scrollbar-width: none !important;
+    }
+
+    /* Force full-screen reels layout */
+    /* Target ALL divs in the video container chain */
+    main, main div {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      min-width: 100vw !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Video should fill entire viewport */
+    video {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      object-fit: cover !important;
+      position: relative !important;
+    }
+
+    /* Clips overlay container - full screen */
+    [id^="clipsoverlay"] {
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    /* Force scroll snap for single-reel view */
+    main {
+      scroll-snap-type: y mandatory !important;
+      height: 100vh !important;
+    }
+
+    /* Each reel container should fill viewport height */
+    main > div > div > div {
+      scroll-snap-align: start !important;
+      min-height: 100vh !important;
+    }
+
+    /* Remove any side margins on article/section containers */
+    article, section {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100vw !important;
+    }
+
+    /* Background black everywhere */
+    main, main * {
+      background-color: black !important;
+    }
+
+    /* Except for text elements */
+    main span, main p, main a {
+      background-color: transparent !important;
     }
 
     /* Audio/Music links - NOT hidden to preserve video audio */
@@ -1441,9 +1498,9 @@
       if (isInstaPumpElement(el) || isVideoContainer(el)) return;
       const rect = el.getBoundingClientRect();
       const label = el.getAttribute('aria-label') || '';
-      // Right edge icons (Like, Comment, Share, More)
-      if (rect.left > vw - 60 &&
-          ['Like', 'Comment', 'Share', 'More', 'Send'].includes(label)) {
+      // Right edge icons (Like, Comment, Share, Save, More) - threshold adjusted for mobile viewports
+      if (rect.left > vw - 100 &&
+          ['Like', 'Comment', 'Share', 'Save', 'More', 'Send'].includes(label)) {
         safeHide(el);
       }
     });
@@ -1457,8 +1514,8 @@
       if (text.includes('Like') &&
           text.includes('Comment') &&
           text.includes('Share') &&
-          rect.left > vw - 60 &&
-          rect.width < 50) {
+          rect.left > vw - 100 &&
+          rect.width < 80) {
         safeHide(el);
       }
     });
