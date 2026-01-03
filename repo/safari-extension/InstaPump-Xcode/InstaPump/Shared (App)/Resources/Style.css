@@ -179,6 +179,41 @@ h1 {
     transform: translateY(0);
 }
 
+/* Secondary button */
+.btn-secondary {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1.5px solid var(--primary-color);
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+}
+
+.btn-secondary:hover {
+    background: rgba(225, 48, 108, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Button group */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    width: 100%;
+}
+
+.button-group button {
+    width: 100%;
+}
+
 /* Features section */
 .features {
     margin-top: 32px;
