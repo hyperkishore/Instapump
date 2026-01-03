@@ -65,6 +65,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **Auto-advance working** - Uses timestamp validation (2000ms threshold)
 - ✅ **FAB overlap fixed** - Moved from bottom:100px to bottom:160px
 - ✅ **Scroll up improved** - Uses `block: 'center'` + fallback scroll
+- ✅ **Chrome tested** (2026-01-03) - All features working, no errors
 
 ### Version History This Session
 - **v2.1.62** - Auto-advance timestamp fix (2000ms threshold)
