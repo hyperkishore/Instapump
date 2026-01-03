@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.62
+// @version      2.1.72
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,43 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.66';
+  const VERSION = '2.1.72';
+
+  // ==================== FEATURE FLAGS ====================
+  // Enable/disable features for safe rollout and quick rollback
+  // Set to false to disable a feature without removing code
+  const FEATURES = {
+    // Video display
+    videoCentering: true,         // v2.1.69 - Center video vertically
+    debugBorder: true,            // DEBUG - Red border around video (set false for production)
+
+    // UI Hiding
+    hideNavBar: true,             // v2.1.0 - Hide bottom navigation
+    hideMessages: true,           // v2.1.67 - Hide DM button (desktop)
+    hideScrollbars: true,         // v2.1.0 - Hide scrollbars
+
+    // Navigation
+    autoAdvance: true,            // v2.1.18 - Auto-advance when video ends
+    timestampValidation: true,    // v2.1.62 - Prevent premature skipping
+
+    // Interactions
+    swipeGestures: true,          // v2.1.0 - Swipe to approve/reject
+    keyboardShortcuts: true,      // v2.1.0 - Arrow keys, M, P, L
+
+    // Mode filtering
+    modeFiltering: true,          // v2.1.0 - Discovery/Whitelist modes
+
+    // Debug tools (hidden by default)
+    debugTools: false,            // Element picker, tap inspector, logs
+  };
+
+  // Feature flag helper - check if feature is enabled
+  function isFeatureEnabled(featureName) {
+    return FEATURES[featureName] === true;
+  }
+
+  // Log feature status on load
+  console.log('[InstaPump] Feature flags:', FEATURES);
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -279,45 +315,75 @@
   let debugModeEnabled = false;
   let touchLoggingEnabled = false; // Separate opt-in for touch event logging
 
-  // CSS - Carefully adding back UI hiding
-  const HIDE_CSS = `
-    /* Hide bottom navigation bar */
-    div[role="tablist"],
-    nav[role="navigation"] {
-      display: none !important;
+  // CSS - Built dynamically based on feature flags
+  // Base CSS - always active (video centering)
+  function buildBaseCSS() {
+    let css = '';
+
+    if (FEATURES.debugBorder) {
+      css += `
+        video { border: 3px solid red !important; box-sizing: border-box !important; }
+      `;
     }
 
-    /* Black background */
-    body, html {
-      background: black !important;
+    if (FEATURES.videoCentering) {
+      css += `
+        video {
+          position: relative !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+        }
+      `;
     }
 
-    /* Full-screen video layout - remove gaps */
-    main, main > div, main > section {
-      width: 100vw !important;
-      max-width: 100vw !important;
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      box-sizing: border-box !important;
+    return css;
+  }
+  const BASE_CSS = buildBaseCSS();
+
+  // Toggleable CSS - can be turned off via hiding toggle
+  function buildHideCSS() {
+    let css = '';
+
+    if (FEATURES.hideNavBar) {
+      css += `
+        div[role="tablist"], nav[role="navigation"] { display: none !important; }
+      `;
     }
 
-    /* Black background on containers */
-    main {
-      background-color: black !important;
+    if (FEATURES.hideMessages) {
+      css += `
+        div:has(> div > svg[aria-label="Messages"]) { display: none !important; }
+      `;
     }
 
-    /* Hide scrollbars */
-    *::-webkit-scrollbar {
-      display: none !important;
-    }
-    * {
-      scrollbar-width: none !important;
+    if (FEATURES.hideScrollbars) {
+      css += `
+        *::-webkit-scrollbar { display: none !important; }
+        * { scrollbar-width: none !important; }
+      `;
     }
 
-    /* Audio/Music links - NOT hidden to preserve video audio */
+    // Always include background and layout (not feature-flagged)
+    css += `
+      body, html { background: black !important; }
+      main, main > div, main > section {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+      }
+      main { background-color: black !important; }
+    `;
 
+    return css;
+  }
+  const HIDE_CSS = buildHideCSS();
+
+  // InstaPump UI CSS - always active (never disabled)
+  const UI_CSS = `
     /* ==================== InstaPump UI ==================== */
 
     /* Status border - Animated pulse glow */
@@ -785,13 +851,32 @@
     }
   `;
 
-  // Inject CSS
+  // Inject CSS - base + UI (always on) + hide (toggleable)
   function injectCSS() {
-    if (document.getElementById('instapump-css')) return;
-    const style = document.createElement('style');
-    style.id = 'instapump-css';
-    style.textContent = HIDE_CSS;
-    (document.head || document.documentElement).appendChild(style);
+    // Base CSS - always active (video centering)
+    if (!document.getElementById('instapump-base-css')) {
+      const baseStyle = document.createElement('style');
+      baseStyle.id = 'instapump-base-css';
+      baseStyle.textContent = BASE_CSS;
+      (document.head || document.documentElement).appendChild(baseStyle);
+    }
+
+    // UI CSS - always active (InstaPump interface)
+    if (!document.getElementById('instapump-ui-css')) {
+      const uiStyle = document.createElement('style');
+      uiStyle.id = 'instapump-ui-css';
+      uiStyle.textContent = UI_CSS;
+      (document.head || document.documentElement).appendChild(uiStyle);
+    }
+
+    // Hide CSS - toggleable (Instagram UI hiding)
+    if (!document.getElementById('instapump-hide-css')) {
+      const hideStyle = document.createElement('style');
+      hideStyle.id = 'instapump-hide-css';
+      hideStyle.textContent = HIDE_CSS;
+      hideStyle.disabled = !hidingEnabled;
+      (document.head || document.documentElement).appendChild(hideStyle);
+    }
   }
   injectCSS();
 
@@ -2377,17 +2462,21 @@
       hidingEnabled = !hidingEnabled;
       localStorage.setItem('instapump_hiding', hidingEnabled ? 'true' : 'false');
       const btn = document.getElementById('instapump-btn-hide');
+      const hideStylesheet = document.getElementById('instapump-hide-css');
+
       if (hidingEnabled) {
         btn.classList.remove('disabled');
         btn.classList.add('enabled');
         btn.innerHTML = ICONS.eyeOn;
         showToast('Hiding ON');
+        if (hideStylesheet) hideStylesheet.disabled = false;
         hideElements(); // Re-apply hiding
       } else {
         btn.classList.remove('enabled');
         btn.classList.add('disabled');
         btn.innerHTML = ICONS.eyeOff;
         showToast('Hiding OFF');
+        if (hideStylesheet) hideStylesheet.disabled = true;
         // Restore all hidden elements without refresh
         document.querySelectorAll('[data-instapump-hidden]').forEach(el => {
           el.style.display = '';
