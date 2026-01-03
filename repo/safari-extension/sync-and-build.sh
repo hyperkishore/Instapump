@@ -1,6 +1,11 @@
 #!/bin/bash
-# Sync userscript to Safari extension and rebuild
+# Sync userscript to ALL distribution methods
 # Run this after updating instapump.user.js
+#
+# Updates:
+# 1. iCloud (for Userscripts app users)
+# 2. Safari Extension bundle (for App Store)
+# 3. Xcode project
 
 set -e
 
@@ -9,8 +14,9 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 USERSCRIPT="$REPO_ROOT/userscript/instapump.user.js"
 EXTENSION_DIR="$SCRIPT_DIR/instapump-appstore"
 XCODE_DIR="$SCRIPT_DIR/InstaPump-Xcode/InstaPump"
+ICLOUD_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Userscripts"
 
-echo "📦 InstaPump Safari Extension - Sync & Build"
+echo "📦 InstaPump - Sync All Distribution Methods"
 echo "============================================="
 
 # Check userscript exists
@@ -22,6 +28,24 @@ fi
 # Extract version from userscript
 VERSION=$(grep -m1 "const VERSION = " "$USERSCRIPT" | sed "s/.*'\([^']*\)'.*/\1/")
 echo "📋 Userscript version: $VERSION"
+
+# ========================================
+# 1. Sync to iCloud (Userscripts app)
+# ========================================
+echo ""
+echo "☁️  Method 1: iCloud (Userscripts app)"
+if [ -d "$ICLOUD_DIR" ]; then
+    cp "$USERSCRIPT" "$ICLOUD_DIR/InstaPump.user.js"
+    echo "✅ Synced to iCloud: $ICLOUD_DIR/InstaPump.user.js"
+else
+    echo "⚠️  iCloud folder not found, skipping: $ICLOUD_DIR"
+fi
+
+# ========================================
+# 2. Sync to Safari Extension (App Store)
+# ========================================
+echo ""
+echo "🧩 Method 2: Safari Extension (App Store)"
 
 # Create content.js with Safari header
 echo "🔄 Syncing userscript to content.js..."
@@ -140,10 +164,17 @@ sed -i '' "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" "$EXTENSION_DIR
 echo "✅ manifest.json version updated to $VERSION"
 
 echo ""
-echo "🎉 Sync complete!"
+echo "============================================="
+echo "🎉 All distribution methods synced!"
+echo "============================================="
 echo ""
-echo "Next steps:"
-echo "  1. Open Xcode: open '$XCODE_DIR/InstaPump.xcodeproj'"
-echo "  2. Build: Cmd+B"
-echo "  3. Test in Safari"
-echo "  4. Archive for App Store: Product → Archive"
+echo "📱 Userscripts app (iCloud):"
+echo "   • Auto-syncs to iOS/macOS devices"
+echo "   • Users with loader get updates on next refresh"
+echo ""
+echo "🍎 App Store (Safari Extension):"
+echo "   Next steps to publish update:"
+echo "   1. Open Xcode: open '$XCODE_DIR/InstaPump.xcodeproj'"
+echo "   2. Build: Cmd+B"
+echo "   3. Test in Safari"
+echo "   4. Archive for App Store: Product → Archive"
