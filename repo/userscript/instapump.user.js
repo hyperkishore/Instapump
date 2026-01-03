@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.58
+// @version      2.1.59
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,10 +16,16 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.58';
+  const VERSION = '2.1.59';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
+
+  // Check if running as Safari Web Extension
+  const IS_SAFARI_EXTENSION = typeof browser !== 'undefined' && browser.runtime && browser.runtime.id;
+
+  // App Store URL for Safari extension updates (update after publishing)
+  const APP_STORE_URL = 'https://apps.apple.com/app/instapump/id0000000000';
 
   // Helper function to check if current page is a reels page
   function isOnReelsPage() {
@@ -34,7 +40,8 @@
   }
 
   // Confirm script is loading (only shows on reels pages now)
-  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${LOADED_VIA_LOADER ? ' (via loader)' : ''}`);
+  const loadSource = IS_SAFARI_EXTENSION ? ' (Safari Extension)' : (LOADED_VIA_LOADER ? ' (via loader)' : '');
+  console.log(`🚀 INSTAPUMP ${VERSION} LOADING...${loadSource}`);
 
   // Track UI visibility state
   let instapumpUIVisible = true;
@@ -2027,7 +2034,11 @@
     versionBadge.textContent = `v${VERSION}`;
     versionBadge.addEventListener('click', () => {
       if (versionBadge.classList.contains('outdated')) {
-        if (LOADED_VIA_LOADER) {
+        if (IS_SAFARI_EXTENSION) {
+          // Open App Store for Safari extension update
+          showToast('Opening App Store...');
+          window.open(APP_STORE_URL, '_blank');
+        } else if (LOADED_VIA_LOADER) {
           // Clear loader cache and reload to get new version
           showToast('Updating...');
           localStorage.removeItem('instapump_cached_code');
