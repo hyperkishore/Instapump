@@ -90,16 +90,24 @@ When working on marketing tasks (landing pages, copy, campaigns, value propositi
 
 ## CRITICAL: File Sync Requirement
 
-**After EVERY command that modifies files, sync between these locations:**
-
-1. **Repo**: `/Users/kishore/Desktop/Claude-experiments/InstaPump/repo/userscript/`
-2. **iCloud**: `/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/`
-3. **Phone**: Auto-syncs from iCloud
-
-### Sync Commands (run after every change):
+**After EVERY change to `userscript/instapump.user.js`, run the unified sync script:**
 
 ```bash
-# Repo -> iCloud (after editing in repo)
+./safari-extension/sync-and-build.sh
+```
+
+This single command syncs to ALL distribution methods:
+
+| Method | Location | Users |
+|--------|----------|-------|
+| **iCloud** | `~/Library/Mobile Documents/.../Userscripts/` | Userscripts app users |
+| **Safari Extension** | `safari-extension/instapump-appstore/` | App Store users |
+| **Xcode Project** | `safari-extension/InstaPump-Xcode/` | For building App Store release |
+
+### Manual Sync (if needed):
+
+```bash
+# Repo -> iCloud only
 cp repo/userscript/instapump.user.js "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/InstaPump.user.js"
 
 # iCloud -> Repo (after testing/editing on device)
@@ -108,7 +116,7 @@ cp "/Users/kishore/Library/Mobile Documents/com~apple~CloudDocs/Userscripts/Inst
 
 ---
 
-## Current Version: 2.1.56
+## Current Version: 2.1.59
 
 ### Features
 - **Mode Toggle**: Discovery (D) vs Whitelist (W) mode
