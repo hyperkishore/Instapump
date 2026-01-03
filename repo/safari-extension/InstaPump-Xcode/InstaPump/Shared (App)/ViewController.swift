@@ -60,19 +60,36 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-#if os(macOS)
-        if (message.body as! String != "open-preferences") {
-            return
-        }
+        guard let messageBody = message.body as? String else { return }
 
-        SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
-            guard error == nil else {
-                // Insert code to inform the user that something went wrong.
-                return
+#if os(iOS)
+        if messageBody == "open-settings" {
+            // Open iOS Settings app - Safari settings
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
+        } else if messageBody == "open-instagram" {
+            // Open Instagram Reels in Safari
+            if let url = URL(string: "https://www.instagram.com/reels/") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+#elseif os(macOS)
+        if messageBody == "open-preferences" {
+            SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
+                guard error == nil else {
+                    // Insert code to inform the user that something went wrong.
+                    return
+                }
 
-            DispatchQueue.main.async {
-                NSApp.terminate(self)
+                DispatchQueue.main.async {
+                    NSApp.terminate(self)
+                }
+            }
+        } else if messageBody == "open-instagram" {
+            // Open Instagram Reels in Safari
+            if let url = URL(string: "https://www.instagram.com/reels/") {
+                NSWorkspace.shared.open(url)
             }
         }
 #endif
