@@ -60,24 +60,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Session Notes (2026-01-03)
 
-### v2.1.63 Status
-- **Auto-advance fix working** - Uses timestamp validation (2000ms threshold)
-- **FAB overlap fixed** - Moved FAB from bottom:100px to bottom:160px
-- **iOS video fix** - Commented out aggressive video CSS that was hiding content
+### v2.1.66 Status (Latest)
+- ✅ **Video displays properly** on iOS Safari
+- ✅ **Auto-advance working** - Uses timestamp validation (2000ms threshold)
+- ✅ **FAB overlap fixed** - Moved from bottom:100px to bottom:160px
+- ✅ **Scroll up improved** - Uses `block: 'center'` + fallback scroll
 
-### Changes in v2.1.63
-1. FAB position: `bottom: 100px` → `bottom: 160px` (avoids Instagram's audio button)
-2. Removed aggressive CSS: `video { width:100vw; height:100dvh }` (was hiding video on iOS)
-3. Removed: `main * { background-color: black }` (too broad, applied to video)
+### Version History This Session
+- **v2.1.62** - Auto-advance timestamp fix (2000ms threshold)
+- **v2.1.63** - FAB position fix, removed aggressive video CSS
+- **v2.1.64** - Added flexbox centering (BROKE video display)
+- **v2.1.65** - Improved scroll up reliability
+- **v2.1.66** - Removed flexbox CSS that broke video (hotfix)
 
-### Known Issues
-- **Chrome extension requires manual reload** - After updating `extension/content.js`, must reload in `chrome://extensions/`
+### Key Learnings
+- **Don't use `display: flex` on clipsoverlay** - Breaks Instagram's video layout
+- **Don't force video dimensions** - `video { width:100vw; height:100dvh }` hides video on iOS
+- **Don't use `main * { background-color }** - Too broad, affects video
 
-### Files Modified This Session
-- `userscript/instapump.user.js` - v2.1.63
-- `extension/content.js` - synced from userscript
-- `extension/manifest.json` - version 2.1.63
-- `safari-extension/instapump-appstore/content.js` - synced via sync script
+### All Distributions Synced
+All platforms verified at v2.1.66 with identical code:
+- `userscript/instapump.user.js`
+- `extension/content.js` (Chrome)
+- `safari-extension/instapump-appstore/content.js`
+- `safari-extension/InstaPump-Xcode/.../content.js`
+- iCloud Userscripts folder
 
 ---
 
