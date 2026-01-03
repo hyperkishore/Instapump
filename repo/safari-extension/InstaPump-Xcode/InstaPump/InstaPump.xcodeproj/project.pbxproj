@@ -1,0 +1,1005 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		034C1B342F08B9990095090C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B332F08B9990095090C /* AppDelegate.swift */; };
+		034C1B362F08B9990095090C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B352F08B9990095090C /* SceneDelegate.swift */; };
+		034C1B392F08B9990095090C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B372F08B9990095090C /* LaunchScreen.storyboard */; };
+		034C1B3C2F08B9990095090C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B3A2F08B9990095090C /* Main.storyboard */; };
+		034C1B452F08B9990095090C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B442F08B9990095090C /* AppDelegate.swift */; };
+		034C1B482F08B9990095090C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B462F08B9990095090C /* Main.storyboard */; };
+		034C1B4F2F08B9990095090C /* InstaPump Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 034C1B4E2F08B9990095090C /* InstaPump Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		034C1B592F08B9990095090C /* InstaPump Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 034C1B582F08B9990095090C /* InstaPump Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		034C1B5E2F08B9990095090C /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B232F08B9970095090C /* Main.html */; };
+		034C1B5F2F08B9990095090C /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B232F08B9970095090C /* Main.html */; };
+		034C1B602F08B9990095090C /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B252F08B9970095090C /* Icon.png */; };
+		034C1B612F08B9990095090C /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B252F08B9970095090C /* Icon.png */; };
+		034C1B622F08B9990095090C /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B262F08B9970095090C /* Style.css */; };
+		034C1B632F08B9990095090C /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B262F08B9970095090C /* Style.css */; };
+		034C1B642F08B9990095090C /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B272F08B9970095090C /* Script.js */; };
+		034C1B652F08B9990095090C /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B272F08B9970095090C /* Script.js */; };
+		034C1B662F08B9990095090C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B282F08B9970095090C /* ViewController.swift */; };
+		034C1B672F08B9990095090C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B282F08B9970095090C /* ViewController.swift */; };
+		034C1B682F08B9990095090C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B292F08B9990095090C /* Assets.xcassets */; };
+		034C1B692F08B9990095090C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B292F08B9990095090C /* Assets.xcassets */; };
+		034C1B6A2F08B9990095090C /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B2B2F08B9990095090C /* SafariWebExtensionHandler.swift */; };
+		034C1B6B2F08B9990095090C /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034C1B2B2F08B9990095090C /* SafariWebExtensionHandler.swift */; };
+		034C1B852F08B99A0095090C /* popup in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B7D2F08B99A0095090C /* popup */; };
+		034C1B862F08B99A0095090C /* generate_icons.py in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B7E2F08B99A0095090C /* generate_icons.py */; };
+		034C1B872F08B99A0095090C /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B7F2F08B99A0095090C /* background.js */; };
+		034C1B882F08B99A0095090C /* images in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B802F08B99A0095090C /* images */; };
+		034C1B892F08B99A0095090C /* generate_xcode_project.sh in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B812F08B99A0095090C /* generate_xcode_project.sh */; };
+		034C1B8A2F08B99A0095090C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B822F08B99A0095090C /* README.md */; };
+		034C1B8B2F08B99A0095090C /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B832F08B99A0095090C /* manifest.json */; };
+		034C1B8C2F08B99A0095090C /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B842F08B99A0095090C /* content.js */; };
+		034C1B8D2F08B99A0095090C /* popup in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B7D2F08B99A0095090C /* popup */; };
+		034C1B8E2F08B99A0095090C /* generate_icons.py in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B7E2F08B99A0095090C /* generate_icons.py */; };
+		034C1B8F2F08B99A0095090C /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B7F2F08B99A0095090C /* background.js */; };
+		034C1B902F08B99A0095090C /* images in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B802F08B99A0095090C /* images */; };
+		034C1B912F08B99A0095090C /* generate_xcode_project.sh in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B812F08B99A0095090C /* generate_xcode_project.sh */; };
+		034C1B922F08B99A0095090C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B822F08B99A0095090C /* README.md */; };
+		034C1B932F08B99A0095090C /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B832F08B99A0095090C /* manifest.json */; };
+		034C1B942F08B99A0095090C /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 034C1B842F08B99A0095090C /* content.js */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		034C1B502F08B9990095090C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 034C1B1D2F08B9960095090C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 034C1B4D2F08B9990095090C;
+			remoteInfo = "InstaPump Extension (iOS)";
+		};
+		034C1B5A2F08B9990095090C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 034C1B1D2F08B9960095090C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 034C1B572F08B9990095090C;
+			remoteInfo = "InstaPump Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		034C1B712F08B9990095090C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				034C1B4F2F08B9990095090C /* InstaPump Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B782F08B9990095090C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				034C1B592F08B9990095090C /* InstaPump Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		034C1B242F08B9970095090C /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		034C1B252F08B9970095090C /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		034C1B262F08B9970095090C /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		034C1B272F08B9970095090C /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		034C1B282F08B9970095090C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		034C1B292F08B9990095090C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		034C1B2B2F08B9990095090C /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		034C1B302F08B9990095090C /* InstaPump.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstaPump.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		034C1B332F08B9990095090C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		034C1B352F08B9990095090C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		034C1B382F08B9990095090C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		034C1B3B2F08B9990095090C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		034C1B3D2F08B9990095090C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		034C1B422F08B9990095090C /* InstaPump.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstaPump.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		034C1B442F08B9990095090C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		034C1B472F08B9990095090C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		034C1B492F08B9990095090C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		034C1B4E2F08B9990095090C /* InstaPump Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "InstaPump Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		034C1B532F08B9990095090C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		034C1B582F08B9990095090C /* InstaPump Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "InstaPump Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		034C1B5D2F08B9990095090C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		034C1B7D2F08B99A0095090C /* popup */ = {isa = PBXFileReference; lastKnownFileType = folder; name = popup; path = Resources/popup; sourceTree = "<group>"; };
+		034C1B7E2F08B99A0095090C /* generate_icons.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = generate_icons.py; path = Resources/generate_icons.py; sourceTree = "<group>"; };
+		034C1B7F2F08B99A0095090C /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		034C1B802F08B99A0095090C /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = Resources/images; sourceTree = "<group>"; };
+		034C1B812F08B99A0095090C /* generate_xcode_project.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = generate_xcode_project.sh; path = Resources/generate_xcode_project.sh; sourceTree = "<group>"; };
+		034C1B822F08B99A0095090C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = Resources/README.md; sourceTree = "<group>"; };
+		034C1B832F08B99A0095090C /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		034C1B842F08B99A0095090C /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = Resources/content.js; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		034C1B2D2F08B9990095090C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B3F2F08B9990095090C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B4B2F08B9990095090C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B552F08B9990095090C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034C1B1C2F08B9960095090C = {
+			isa = PBXGroup;
+			children = (
+				034C1B212F08B9970095090C /* Shared (App) */,
+				034C1B2A2F08B9990095090C /* Shared (Extension) */,
+				034C1B322F08B9990095090C /* iOS (App) */,
+				034C1B432F08B9990095090C /* macOS (App) */,
+				034C1B522F08B9990095090C /* iOS (Extension) */,
+				034C1B5C2F08B9990095090C /* macOS (Extension) */,
+				034C1B312F08B9990095090C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		034C1B212F08B9970095090C /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B282F08B9970095090C /* ViewController.swift */,
+				034C1B292F08B9990095090C /* Assets.xcassets */,
+				034C1B222F08B9970095090C /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		034C1B222F08B9970095090C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B232F08B9970095090C /* Main.html */,
+				034C1B252F08B9970095090C /* Icon.png */,
+				034C1B262F08B9970095090C /* Style.css */,
+				034C1B272F08B9970095090C /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		034C1B2A2F08B9990095090C /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B7C2F08B99A0095090C /* Resources */,
+				034C1B2B2F08B9990095090C /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		034C1B312F08B9990095090C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B302F08B9990095090C /* InstaPump.app */,
+				034C1B422F08B9990095090C /* InstaPump.app */,
+				034C1B4E2F08B9990095090C /* InstaPump Extension.appex */,
+				034C1B582F08B9990095090C /* InstaPump Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		034C1B322F08B9990095090C /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B332F08B9990095090C /* AppDelegate.swift */,
+				034C1B352F08B9990095090C /* SceneDelegate.swift */,
+				034C1B372F08B9990095090C /* LaunchScreen.storyboard */,
+				034C1B3A2F08B9990095090C /* Main.storyboard */,
+				034C1B3D2F08B9990095090C /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		034C1B432F08B9990095090C /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B442F08B9990095090C /* AppDelegate.swift */,
+				034C1B462F08B9990095090C /* Main.storyboard */,
+				034C1B492F08B9990095090C /* Info.plist */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		034C1B522F08B9990095090C /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B532F08B9990095090C /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		034C1B5C2F08B9990095090C /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B5D2F08B9990095090C /* Info.plist */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		034C1B7C2F08B99A0095090C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				034C1B7D2F08B99A0095090C /* popup */,
+				034C1B7E2F08B99A0095090C /* generate_icons.py */,
+				034C1B7F2F08B99A0095090C /* background.js */,
+				034C1B802F08B99A0095090C /* images */,
+				034C1B812F08B99A0095090C /* generate_xcode_project.sh */,
+				034C1B822F08B99A0095090C /* README.md */,
+				034C1B832F08B99A0095090C /* manifest.json */,
+				034C1B842F08B99A0095090C /* content.js */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		034C1B2F2F08B9990095090C /* InstaPump (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 034C1B722F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump (iOS)" */;
+			buildPhases = (
+				034C1B2C2F08B9990095090C /* Sources */,
+				034C1B2D2F08B9990095090C /* Frameworks */,
+				034C1B2E2F08B9990095090C /* Resources */,
+				034C1B712F08B9990095090C /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				034C1B512F08B9990095090C /* PBXTargetDependency */,
+			);
+			name = "InstaPump (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "InstaPump (iOS)";
+			productReference = 034C1B302F08B9990095090C /* InstaPump.app */;
+			productType = "com.apple.product-type.application";
+		};
+		034C1B412F08B9990095090C /* InstaPump (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 034C1B792F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump (macOS)" */;
+			buildPhases = (
+				034C1B3E2F08B9990095090C /* Sources */,
+				034C1B3F2F08B9990095090C /* Frameworks */,
+				034C1B402F08B9990095090C /* Resources */,
+				034C1B782F08B9990095090C /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				034C1B5B2F08B9990095090C /* PBXTargetDependency */,
+			);
+			name = "InstaPump (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "InstaPump (macOS)";
+			productReference = 034C1B422F08B9990095090C /* InstaPump.app */;
+			productType = "com.apple.product-type.application";
+		};
+		034C1B4D2F08B9990095090C /* InstaPump Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 034C1B6E2F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump Extension (iOS)" */;
+			buildPhases = (
+				034C1B4A2F08B9990095090C /* Sources */,
+				034C1B4B2F08B9990095090C /* Frameworks */,
+				034C1B4C2F08B9990095090C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "InstaPump Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "InstaPump Extension (iOS)";
+			productReference = 034C1B4E2F08B9990095090C /* InstaPump Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		034C1B572F08B9990095090C /* InstaPump Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 034C1B752F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump Extension (macOS)" */;
+			buildPhases = (
+				034C1B542F08B9990095090C /* Sources */,
+				034C1B552F08B9990095090C /* Frameworks */,
+				034C1B562F08B9990095090C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "InstaPump Extension (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "InstaPump Extension (macOS)";
+			productReference = 034C1B582F08B9990095090C /* InstaPump Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		034C1B1D2F08B9960095090C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					034C1B2F2F08B9990095090C = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					034C1B412F08B9990095090C = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					034C1B4D2F08B9990095090C = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					034C1B572F08B9990095090C = {
+						CreatedOnToolsVersion = 26.2;
+					};
+				};
+			};
+			buildConfigurationList = 034C1B202F08B9960095090C /* Build configuration list for PBXProject "InstaPump" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 034C1B1C2F08B9960095090C;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 034C1B312F08B9990095090C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				034C1B2F2F08B9990095090C /* InstaPump (iOS) */,
+				034C1B412F08B9990095090C /* InstaPump (macOS) */,
+				034C1B4D2F08B9990095090C /* InstaPump Extension (iOS) */,
+				034C1B572F08B9990095090C /* InstaPump Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		034C1B2E2F08B9990095090C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B602F08B9990095090C /* Icon.png in Resources */,
+				034C1B392F08B9990095090C /* LaunchScreen.storyboard in Resources */,
+				034C1B5E2F08B9990095090C /* Main.html in Resources */,
+				034C1B642F08B9990095090C /* Script.js in Resources */,
+				034C1B682F08B9990095090C /* Assets.xcassets in Resources */,
+				034C1B3C2F08B9990095090C /* Main.storyboard in Resources */,
+				034C1B622F08B9990095090C /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B402F08B9990095090C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B612F08B9990095090C /* Icon.png in Resources */,
+				034C1B632F08B9990095090C /* Style.css in Resources */,
+				034C1B482F08B9990095090C /* Main.storyboard in Resources */,
+				034C1B652F08B9990095090C /* Script.js in Resources */,
+				034C1B692F08B9990095090C /* Assets.xcassets in Resources */,
+				034C1B5F2F08B9990095090C /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B4C2F08B9990095090C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B942F08B99A0095090C /* content.js in Resources */,
+				034C1B922F08B99A0095090C /* README.md in Resources */,
+				034C1B932F08B99A0095090C /* manifest.json in Resources */,
+				034C1B912F08B99A0095090C /* generate_xcode_project.sh in Resources */,
+				034C1B902F08B99A0095090C /* images in Resources */,
+				034C1B8E2F08B99A0095090C /* generate_icons.py in Resources */,
+				034C1B8F2F08B99A0095090C /* background.js in Resources */,
+				034C1B8D2F08B99A0095090C /* popup in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B562F08B9990095090C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B8C2F08B99A0095090C /* content.js in Resources */,
+				034C1B8A2F08B99A0095090C /* README.md in Resources */,
+				034C1B8B2F08B99A0095090C /* manifest.json in Resources */,
+				034C1B892F08B99A0095090C /* generate_xcode_project.sh in Resources */,
+				034C1B882F08B99A0095090C /* images in Resources */,
+				034C1B862F08B99A0095090C /* generate_icons.py in Resources */,
+				034C1B872F08B99A0095090C /* background.js in Resources */,
+				034C1B852F08B99A0095090C /* popup in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		034C1B2C2F08B9990095090C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B662F08B9990095090C /* ViewController.swift in Sources */,
+				034C1B342F08B9990095090C /* AppDelegate.swift in Sources */,
+				034C1B362F08B9990095090C /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B3E2F08B9990095090C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B672F08B9990095090C /* ViewController.swift in Sources */,
+				034C1B452F08B9990095090C /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B4A2F08B9990095090C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B6A2F08B9990095090C /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		034C1B542F08B9990095090C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				034C1B6B2F08B9990095090C /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		034C1B512F08B9990095090C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 034C1B4D2F08B9990095090C /* InstaPump Extension (iOS) */;
+			targetProxy = 034C1B502F08B9990095090C /* PBXContainerItemProxy */;
+		};
+		034C1B5B2F08B9990095090C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 034C1B572F08B9990095090C /* InstaPump Extension (macOS) */;
+			targetProxy = 034C1B5A2F08B9990095090C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		034C1B232F08B9970095090C /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				034C1B242F08B9970095090C /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		034C1B372F08B9990095090C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				034C1B382F08B9990095090C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		034C1B3A2F08B9990095090C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				034C1B3B2F08B9990095090C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		034C1B462F08B9990095090C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				034C1B472F08B9990095090C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		034C1B6C2F08B9990095090C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		034C1B6D2F08B9990095090C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		034C1B6F2F08B9990095090C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "InstaPump Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari.Extension;
+				PRODUCT_NAME = "InstaPump Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		034C1B702F08B9990095090C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "InstaPump Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari.Extension;
+				PRODUCT_NAME = "InstaPump Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		034C1B732F08B9990095090C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = InstaPump;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari;
+				PRODUCT_NAME = InstaPump;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		034C1B742F08B9990095090C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = InstaPump;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari;
+				PRODUCT_NAME = InstaPump;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		034C1B762F08B9990095090C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "InstaPump Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari.Extension;
+				PRODUCT_NAME = "InstaPump Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		034C1B772F08B9990095090C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "InstaPump Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari.Extension;
+				PRODUCT_NAME = "InstaPump Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		034C1B7A2F08B9990095090C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = InstaPump;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari;
+				PRODUCT_NAME = InstaPump;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		034C1B7B2F08B9990095090C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = InstaPump;
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.instapump.safari;
+				PRODUCT_NAME = InstaPump;
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		034C1B202F08B9960095090C /* Build configuration list for PBXProject "InstaPump" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				034C1B6C2F08B9990095090C /* Debug */,
+				034C1B6D2F08B9990095090C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		034C1B6E2F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				034C1B6F2F08B9990095090C /* Debug */,
+				034C1B702F08B9990095090C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		034C1B722F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				034C1B732F08B9990095090C /* Debug */,
+				034C1B742F08B9990095090C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		034C1B752F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				034C1B762F08B9990095090C /* Debug */,
+				034C1B772F08B9990095090C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		034C1B792F08B9990095090C /* Build configuration list for PBXNativeTarget "InstaPump (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				034C1B7A2F08B9990095090C /* Debug */,
+				034C1B7B2F08B9990095090C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 034C1B1D2F08B9960095090C /* Project object */;
+}
