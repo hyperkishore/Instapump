@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.65';
+  const VERSION = '2.1.66';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -303,18 +303,7 @@
       box-sizing: border-box !important;
     }
 
-    /* Center video vertically in container */
-    [id^="clipsoverlay"] {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      background-color: black !important;
-    }
-
-    /* Black background on main container */
+    /* Black background on containers */
     main {
       background-color: black !important;
     }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "InstaPump",
-  "version": "2.1.65",
+  "version": "2.1.66",
   "description": "Clean Instagram Reels experience with account filtering. Swipe to approve/reject, toggle modes, and curate your feed.",
   "permissions": [],
   "host_permissions": [
