@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstaPump - Clean Reels Experience
 // @namespace    https://instapump.app
-// @version      2.1.59
+// @version      2.1.60
 // @description  Full-screen Instagram Reels with filtering, swipe gestures, and element picker
 // @author       InstaPump
 // @match        https://www.instagram.com/*
@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.59';
+  const VERSION = '2.1.60';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -290,6 +290,37 @@
     /* Black background */
     body, html {
       background: black !important;
+    }
+
+    /* Full-screen video layout - remove gaps */
+    main, main > div, main > section {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Force videos to fill viewport */
+    video {
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important; /* Dynamic viewport height for mobile */
+      object-fit: cover !important;
+    }
+
+    /* Ensure black background on all containers */
+    main, main * {
+      background-color: black !important;
+    }
+
+    /* Fix clip overlay containers */
+    [id^="clipsoverlay"] {
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
     }
 
     /* Hide scrollbars */
@@ -1135,6 +1166,10 @@
   let lastAdvanceTime = 0;
   const ADVANCE_DEBOUNCE_MS = 1000; // Prevent multiple advances within 1 second
 
+  // Track navigation direction to allow going back without auto-skip
+  let lastNavigationDirection = null;
+  let navigationCooldownUntil = 0;
+
   function debounceAdvance(reason) {
     const now = Date.now();
     if (now - lastAdvanceTime < ADVANCE_DEBOUNCE_MS) {
@@ -1213,8 +1248,9 @@
           video.dataset.wasNearEnd = 'true';
         }
 
-        // When video is near the end (last 0.3 seconds) - tighter threshold
-        if (timeLeft < 0.3 && timeLeft >= 0 && video.currentTime > 1) {
+        // When video is near the end (last 0.2 seconds) - only trigger very close to end
+        // Increased from 0.3 to be less aggressive
+        if (timeLeft < 0.2 && timeLeft >= 0 && video.currentTime > 2) {
           if (isVisibleVideo(video)) {
             // Only trigger once per play-through
             if (!video.dataset.advanceTriggered) {
@@ -1235,9 +1271,19 @@
   }
 
   // Navigation - find and scroll the correct container
-  function navigateReel(direction) {
+  function navigateReel(direction, isAutoSkip = false) {
     const vh = window.innerHeight;
     const overlays = Array.from(document.querySelectorAll('[id^="clipsoverlay"]'));
+
+    // Track navigation direction for mode filter cooldown
+    if (!isAutoSkip) {
+      lastNavigationDirection = direction;
+      // Give 2 second cooldown when going back to prevent immediate re-skip
+      if (direction === 'prev') {
+        navigationCooldownUntil = Date.now() + 2000;
+        log('[NAV] Going back - mode filter cooldown active for 2s');
+      }
+    }
 
     log(`navigateReel(${direction}): ${overlays.length} overlays in DOM`);
 
@@ -1369,7 +1415,16 @@
       sessionStats.reelsSkipped++;
       incrementDailyStat('reelsSkipped');
       log(`[STATS] Reels skipped this session: ${sessionStats.reelsSkipped}`);
-      setTimeout(() => navigateReel('next'), 300);
+
+      // Check if we're in navigation cooldown (user went back to review)
+      const now = Date.now();
+      if (now < navigationCooldownUntil) {
+        log(`[NAV] Cooldown active - NOT auto-skipping (${Math.round((navigationCooldownUntil - now) / 1000)}s left)`);
+        showToast('Review mode - swipe to skip');
+      } else {
+        // Normal auto-skip
+        setTimeout(() => navigateReel('next', true), 300);
+      }
     } else {
       sessionStats.reelsViewed++;
       incrementDailyStat('reelsViewed');
