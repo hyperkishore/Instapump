@@ -58,6 +58,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## Current Session Notes (2026-01-03)
+
+### v2.1.63 Status
+- **Auto-advance fix working** - Uses timestamp validation (2000ms threshold)
+- **FAB overlap fixed** - Moved FAB from bottom:100px to bottom:160px
+- **iOS video fix** - Commented out aggressive video CSS that was hiding content
+
+### Changes in v2.1.63
+1. FAB position: `bottom: 100px` → `bottom: 160px` (avoids Instagram's audio button)
+2. Removed aggressive CSS: `video { width:100vw; height:100dvh }` (was hiding video on iOS)
+3. Removed: `main * { background-color: black }` (too broad, applied to video)
+
+### Known Issues
+- **Chrome extension requires manual reload** - After updating `extension/content.js`, must reload in `chrome://extensions/`
+
+### Files Modified This Session
+- `userscript/instapump.user.js` - v2.1.63
+- `extension/content.js` - synced from userscript
+- `extension/manifest.json` - version 2.1.63
+- `safari-extension/instapump-appstore/content.js` - synced via sync script
+
+---
+
 # InstaPump
 
 Safari userscript for clean Instagram Reels viewing with account filtering. Also available as Chrome Extension and Electron app.

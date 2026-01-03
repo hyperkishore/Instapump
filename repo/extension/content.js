@@ -16,7 +16,7 @@
   'use strict';
 
   // Version constant - update this when releasing new versions
-  const VERSION = '2.1.62';
+  const VERSION = '2.1.63';
 
   // Check if loaded via loader (loader manages updates)
   const LOADED_VIA_LOADER = window.__instapump_loader === true;
@@ -303,16 +303,17 @@
       box-sizing: border-box !important;
     }
 
-    /* Force videos to fill viewport */
+    /* Force videos to fill viewport - commented out due to iOS issues
     video {
       width: 100vw !important;
       height: 100vh !important;
-      height: 100dvh !important; /* Dynamic viewport height for mobile */
+      height: 100dvh !important;
       object-fit: cover !important;
     }
+    */
 
-    /* Ensure black background on all containers */
-    main, main * {
+    /* Black background on main container only (not children to avoid hiding video) */
+    main {
       background-color: black !important;
     }
 
@@ -364,7 +365,7 @@
     /* FAB Container - Minimal, fades in on interaction */
     #instapump-fab {
       position: fixed;
-      bottom: 100px;
+      bottom: 160px;
       right: 16px;
       display: flex;
       flex-direction: column-reverse;

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "InstaPump - Clean Reels Experience",
-  "version": "2.1.56",
+  "version": "2.1.63",
   "description": "Full-screen Instagram Reels with hidden UI elements. Approve/reject accounts with keyboard shortcuts.",
   "permissions": [
     "storage",
